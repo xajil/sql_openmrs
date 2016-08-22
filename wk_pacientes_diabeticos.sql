@@ -1,3 +1,4 @@
+/*Contador de cantidad de observaciones realizadas en cada concepto */
 select count(*), person_id, concept_id from obs_hemoglobina
 where person_id = 57
 and concept_id in (
@@ -8,6 +9,18 @@ and concept_id in (
 	159644  -- hemoglobina
  )
 group by person_id, concept_id; -- where numero_open in (42,50);
+
+
+/* Listado de todas las observaciones de hemoglobina por fecha de observacion descendente  */
+select hemoglobina, date_format(max_obs_date_created_hemoglobina, '%Y%m%d') from obs_hemoglobina
+where person_id = 57
+and concept_id in (
+	
+	159644  -- hemoglobina
+ )
+ order by max_obs_date_created_hemoglobina desc
+;
+
 
 /* Script para OpenMRS Wuqu' Kawoq */
 select 
