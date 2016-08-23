@@ -1,4 +1,5 @@
 /*Contador de cantidad de observaciones realizadas en cada concepto */
+-- Commit desde ubuntu con git(cocacola)
 select count(*), person_id, concept_id from obs_hemoglobina
 where person_id = 57
 and concept_id in (
