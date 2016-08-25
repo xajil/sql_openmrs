@@ -79,8 +79,9 @@ create table tbl_obs_diabeticos as
  where person.person_id = obs.person_id
  -- and person.person_id = 4936
  and obs.concept_id = 5089 -- peso kg
+ and obs.voided =0
  -- group by person.person_id, obs.concept_id, person.birthdate, obs.value_numeric 
- union
+  /*  union
 	 select 
 	 person.person_id, 
 	 obs.concept_id, 
@@ -92,6 +93,7 @@ create table tbl_obs_diabeticos as
 	 -- and person.person_id = 4936
 	 and obs.concept_id = 5090 -- talla cm 
 	 -- group by person.person_id, obs.concept_id, person.birthdate, obs.value_numeric
+ */
  union
 	 select 
 	 person.person_id, 
@@ -103,6 +105,7 @@ create table tbl_obs_diabeticos as
 	 where person.person_id = obs.person_id
 	 -- and person.person_id = 4936
 	 and obs.concept_id = 5085 -- PA SISTÓLICA
+     and obs.voided =0
 	--  group by person.person_id, obs.concept_id, person.birthdate, obs.value_numeric
  union
 	 select 
@@ -115,6 +118,7 @@ create table tbl_obs_diabeticos as
 	 where person.person_id = obs.person_id
 	 -- and person.person_id = 4936
 	 and obs.concept_id = 5086 -- PA DIASTÓLICA
+     and obs.voided =0
 	 -- group by person.person_id, obs.concept_id, person.birthdate, obs.value_numeric
  union
 	 select 
@@ -127,6 +131,7 @@ create table tbl_obs_diabeticos as
 	 where person.person_id = obs.person_id
 	 -- and person.person_id = 4936
 	 and obs.concept_id = 159644 -- hemoglobina
+     and obs.voided =0
 	 -- group by person.person_id, obs.concept_id, person.birthdate, obs.value_numeric     
      -- hemoglobina 159644
 ;
