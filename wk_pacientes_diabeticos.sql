@@ -26,6 +26,7 @@ where person_id = 57
 and concept_id = 159644  -- hemoglobina
 group by person_id, concept_id;
 
+
 /* Script para OpenMRS Wuqu' Kawoq */
 select 
 	person.person_id,
@@ -34,17 +35,15 @@ select
     person.birthdate as fecha_nacimiento,
 	YEAR( sysdate() ) - YEAR(person.birthdate) - (DATE_FORMAT( sysdate(), '%m%d') < DATE_FORMAT(person.birthdate, '%m%d')) as edad,
     person.gender as genero,
-    obs_hemoglobina.peso, obs_hemoglobina.fecha_peso,
-    obs_hemoglobina.talla,obs_hemoglobina.fecha_talla,
-    obs_hemoglobina.sistolica, obs_hemoglobina.fecha_sistolica,
-    obs_hemoglobina.diastolica, obs_hemoglobina.fecha_diastolica,
-    obs_hemoglobina.hemoglobina, obs_hemoglobina.fecha_hemoglobina,
+    tbl_obs_diabeticos.concept_id,
+    tbl_obs_diabeticos.value_numeric,
+    date_format(date_created,'%Y-%m-%d-'),
     location.name as comunidad    
     from person
     left join person_name
 		on person.person_id = person_name.person_id
-	left join obs_hemoglobina
-		on person.person_id = obs_hemoglobina.person_id
+	left join tbl_obs_diabeticos
+		on person.person_id = tbl_obs_diabeticos.person_id
 	left join patient_identifier
 		on person.person_id = patient_identifier.patient_id
         and patient_identifier.identifier_type = 2
@@ -56,25 +55,26 @@ select
     and patient_identifier.identifier in ( '042','050'
     ) --  in ( '0385', '03945')
     group by numero_open, fecha_nacimiento, genero, comunidad;
-    
-   
+
+select * from tbl_obs_diabeticos;
+
+select * from obs_horizontal;    
+truncate table obs_horizontal;
+
+Drop table obs_horizontal;
+create table obs_horizontal as select person_id, hemoglobina, max_obs_date_created_hemoglobina from obs_hemoglobina where person_id = 57;      
 -- paciente,peso, talla, edad, genero, presion sistolica, presion diastolica
+
 DROP TABLE obs_hemoglobina;    
-create table obs_hemoglobina as 
+
+DROP TABLE tbl_obs_diabeticos;  
+create table tbl_obs_diabeticos as 
  select 
  person.person_id, 
  obs.concept_id, 
- person.birthdate,  
- obs.date_created max_obs_date_created_peso , -- )  max_obs_date_created_peso , 
- null max_obs_date_created_talla,
- null max_obs_date_created_sistolica,
- null max_obs_date_created_diastolica, 
- null max_obs_date_created_hemoglobina,
- obs.value_numeric peso
- , null talla
- , null sistólica
- , null diastólica
- , null  hemoglobina
+ person.birthdate, 
+ date_format(obs.date_created,'%Y-%m-%d') date_created, -- obs.date_created , -- )  max_obs_date_created_peso , 
+ obs.value_numeric
  from person, obs
  where person.person_id = obs.person_id
  -- and person.person_id = 4936
@@ -85,16 +85,8 @@ create table obs_hemoglobina as
 	 person.person_id, 
 	 obs.concept_id, 
 	 person.birthdate,  
-     null max_obs_date_created_peso,
-	  obs.date_created max_obs_date_created_talla , -- max(obs.date_created)  max_obs_date_created_talla  , 
-	 null max_obs_date_created_sistolica,
-	 null max_obs_date_created_diastolica, 
-	 null max_obs_date_created_hemoglobina,
-	 null peso,
-	 obs.value_numeric talla
-	, null sistólica
-	, null diastólica
-    , null  hemoglobina
+	 date_format(obs.date_created,'%Y-%m-%d') date_created,-- obs.date_created, -- max(obs.date_created)  max_obs_date_created_talla  , 
+	 obs.value_numeric
  from person, obs
 	 where person.person_id = obs.person_id
 	 -- and person.person_id = 4936
@@ -105,16 +97,8 @@ create table obs_hemoglobina as
 	 person.person_id, 
 	 obs.concept_id, 
 	 person.birthdate,  
-	 null max_obs_date_created_peso,
-     null  max_obs_date_created_talla  , 
-	 obs.date_created max_obs_date_created_sistolica,-- max(obs.date_created)  max_obs_date_created_sistolica ,
-	 null max_obs_date_created_diastolica, 
-	 null max_obs_date_created_hemoglobina,
-	 null peso,
-	 null talla
-	, obs.value_numeric sistólica
-	, null diastólica
-    , null  hemoglobina
+	 date_format(obs.date_created,'%Y-%m-%d') date_created , -- obs.date_created,
+	 obs.value_numeric
 	 from person, obs
 	 where person.person_id = obs.person_id
 	 -- and person.person_id = 4936
@@ -125,17 +109,8 @@ create table obs_hemoglobina as
 	 person.person_id, 
 	 obs.concept_id, 
 	 person.birthdate,  
-	 null max_obs_date_created_peso,
-     null  max_obs_date_created_talla  , 
-	 null max_obs_date_created_sistolica ,
-	  obs.date_created max_obs_date_created_diastolica,-- max(obs.date_created)  max_obs_date_created_diastolica, 
-	 null max_obs_date_created_hemoglobina,
-     
-	 null peso,
-	 null talla
-	, null sistólica
-	, obs.value_numeric diastólica
-    , null  hemoglobina
+	 date_format(obs.date_created,'%Y-%m-%d') date_created, -- obs.date_created,-- max(obs.date_created)  max_obs_date_created_diastolica, 
+	 obs.value_numeric
 	 from person, obs
 	 where person.person_id = obs.person_id
 	 -- and person.person_id = 4936
@@ -146,16 +121,8 @@ create table obs_hemoglobina as
 	 person.person_id, 
 	 obs.concept_id, 
 	 person.birthdate,  
-	 null max_obs_date_created_peso,
-     null  max_obs_date_created_talla  , 
-	 null max_obs_date_created_sistolica ,
-	 null max_obs_date_created_diastolica, 
-	 obs.date_created max_obs_date_created_hemoglobina,-- max(obs.date_created)  max_obs_date_created_hemoglobina,
-	 null peso,
-	 null talla
-	, null sistólica
-    , null diastólica
-	, obs.value_numeric hemoglobina
+	 date_format(obs.date_created,'%Y-%m-%d') date_created , -- obs.date_created,-- max(obs.date_created)  max_obs_date_created_hemoglobina,
+	 obs.value_numeric
 	 from person, obs
 	 where person.person_id = obs.person_id
 	 -- and person.person_id = 4936
