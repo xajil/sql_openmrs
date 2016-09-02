@@ -27,17 +27,18 @@ declare var_DEPO int (3);
 declare var_pastillas int (3);
 
 declare concept_id_ciclo_prestamo int default 163138;
-
+declare valor_elegible int default 3;
 
 DECLARE fin int default 0;
 
 
-
+-- en wk identifier_type = 2  para asegura que es numero_open
+-- filtrar pacientes que no tuvieron una observación en ese mes 
 declare cur_patients cursor for 
 select patient_identifier.identifier as num_open, patient_id
 	from patient_identifier
 		where voided = 0
-        and patient_identifier.patient_id = 139 ; -- en wk identifier_type = 2  para asegura que es numero_open
+        and patient_identifier.patient_id = 139 ; 
 
 declare cur_obs cursor for select concept_id from obs where patient_id = var_patient_id;
 
@@ -54,11 +55,18 @@ open cur_patients;
         
         set var_mes = date_format(sysdate(), '%Y%m%d');
         
+        -- definir cuando no existe obs de ese paciente en esa fecha         
         set var_ciclo_prestamo=
         (select value_numeric from obs
 		where concept_id = concept_id_ciclo_prestamo 
 		and person_id = var_patient_id
 		and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') );
+        
+        if ( var_ciclo_prestamo is not null and var_ciclo_prestamo >= valor_elegible) then
+			set var_elegible = 1;
+			else 
+			set var_elegible =0;
+        end if;
         
         insert into  pda_pivot_report 
         (
