@@ -18,8 +18,11 @@ ciclo_prestamo  int (11) ,
 agencia  int (5),
 elegible  int (5) ,
 tipo_consulta  int (5) ,
-papanicolaou  int (3),
-pelvico  int (3),
+pap_inicial  int (11),
+cant_pap_inicial int(5),
+pelvico  int (11),
+tip_consul_pelvico int (3),
+cant_pelvico int (3),
 EIP  int (3),
 EIP_tratamiento  int (3),
 glucosa  int (3),
@@ -40,3 +43,12 @@ pastillas  int (3)
 create index patien_id_index on pda_pivot_report (patient_id);
 
 create index patient_mes_index on pda_pivot_report (patient_id, mes);
+
+
+create table error_log_pda_repo
+(
+patient_id  int (11) ,
+numero_open  char (50),
+fecha_hora date,
+error_msg varchar(80)
+);
