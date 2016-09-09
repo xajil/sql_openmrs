@@ -13,31 +13,77 @@ create table pda_pivot_report
 (
 patient_id  int (11) ,
 numero_open  char (50),
-mes  date,
+encounter_datetime  date,
+location_id  int (11),
+location_name   varchar (255),
+
 ciclo_prestamo  int (11) ,
 agencia  int (5),
 elegible  int (5) ,
 tipo_consulta  int (5) ,
+
 pap_inicial  int (11),
+tip_consul_pap int (3),
 cant_pap_inicial int(5),
+
+
 pelvico  int (11),
 tip_consul_pelvico int (3),
 cant_pelvico int (3),
-EIP  int (3),
-EIP_tratamiento  int (3),
-glucosa  int (3),
+
+eip  int (11),
+tip_consul_eip int (3),
+cant_eip int (3),
+eip_tratamiento  int (3),
+eip_pareja_tatamiento int (3),
+
+glucosa_ayunas  int (11),
+tip_consul_glucosa_ayunas  int (3),
+cant_glucosa_ayunas  int (3),
+
+glucosa_azar  int (11),
+tip_consul_glucosa_azar  int (3),
+cant_glucosa_azar  int (3),
+
 glucosa_elevada  int (3),
-presion_art  int (3),
+
+presion_sistolica  int (11),
+tip_consul_sistolica  int (3),
+cant_sistolica  int (3),
+
+presio_diastolica  int (11),
+tip_consul_diastolica  int (3),
+cant_diastolica  int (3),
+
 presion_art_elevada  int (3),
-prueba_embarazo  int (3),
-embarazo_positivo  int (3),
-ETS  int (3),
-ETS_positivo  int (11) ,
-seno_examen  int (3),
-resultado_examen_seno  int (11) ,
+
+prueba_embarazo  int (11),
+tip_consul_embarazo  int (3),
+cant_prueba_embarazo  int (3),
+
+embarazada_o_examen_positivo  int (3),
+
+ets  int (11),
+vih  int (11),
+sifilis  int (11),
+hepatitis_b  int (3),
+ets_positivo  int (11) ,
+
+seno_examen  int (11),
+tip_consul_seno  int (3),
+cant_examen_seno  int (3),
+resultado_examen_seno  int (3),
+
+planificacion_familiar  int (11),
 implante  int (3),
-DEPO  int (3),
-pastillas  int (3)
+depo  int (3),
+pastillas  int (3),
+
+encounter_id int (11),
+
+form_id int (11),
+provider_id int (11)
+
 );
 
 create index patien_id_index on pda_pivot_report (patient_id);

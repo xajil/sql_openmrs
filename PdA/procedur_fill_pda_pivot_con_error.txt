@@ -1,0 +1,278 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_pivot_report_fill`()
+BEGIN
+
+declare var_patient_id int (11) ;
+declare var_numero_open char (50);
+declare var_mes date;
+declare var_ciclo_prestamo int (11) ;
+declare var_agencia int (5) default 0;
+declare var_elegible int (5) ;
+declare var_tipo_consulta int (5) ;
+declare var_pap_inicial int (11) ;
+declare var_cant_pap_inicial int (5) ;
+declare var_pelvico int (11);
+declare var_cant_pelvico int (5);
+declare var_tip_consul_pelvico int(3);
+declare var_EIP int (3);
+declare var_EIP_tratamiento int (3);
+declare var_glucosa int (3);
+declare var_glucosa_elevada int (3);
+declare var_presion_art int (3);
+declare var_presion_art_elevada int (3);
+declare var_prueba_embarazo int (3);
+declare var_embarazo_positivo int (3);
+declare var_ETS int (3);
+declare var_ETS_positivo int (11) ;
+declare var_seno_examen int (3);
+declare var_resultado_examen_seno int (11) ;
+declare var_implante int (3);
+declare var_DEPO int (3);
+declare var_pastillas int (3);
+
+declare ciclo_prestamo_concept_id int default 163138;
+declare pap_inicial_concept_id int default 162972;
+declare hecho_concept_value int default 1267; 
+declare pelvico_concept_id int default 162991;
+declare voided_reg int default 0;
+declare  var_encounter_type int (3);
+
+declare num_rows int default 0;
+
+
+DECLARE fin int default 0;
+
+
+
+declare cur_patients cursor for 
+select patient_identifier.identifier as num_open, patient_id
+	from patient_identifier
+		where voided = 0
+        and patient_identifier.patient_id in(  139 , 1744 , 1558 ); -- en wk identifier_type = 2  para asegura que es numero_open
+
+-- declare cur_obs cursor for select concept_id from obs where patient_id = var_patient_id;
+
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET fin = 1;
+
+declare exit handler for 1242
+    begin
+        insert into error_log_pda_repo values 
+        ( var_patient_id , var_numero_open, current_date,  'más de un valor de retrono');
+    end;
+
+
+open cur_patients;
+select FOUND_ROWS () into num_rows;
+
+	loop_patients: loop
+		fetch cur_patients into var_numero_open, var_patient_id;
+		
+set var_ciclo_prestamo = -1 ;
+set var_agencia = -1 ;
+set var_elegible = -1 ;
+set var_tipo_consulta = -1 ;
+set var_pap_inicial = -1 ;
+set var_cant_pap_inicial = -1 ;
+set var_pelvico = -1 ;
+set var_tip_consul_pelvico = -1 ;
+set var_cant_pelvico = -1 ;
+set var_EIP = -1 ;
+set var_EIP_tratamiento = -1 ;
+set var_glucosa = -1 ;
+set var_glucosa_elevada = -1 ;
+set var_presion_art = -1 ;
+set var_presion_art_elevada = -1 ;
+set var_prueba_embarazo = -1 ;
+set var_embarazo_positivo = -1 ;
+set var_ETS = -1 ;
+set var_ETS_positivo = -1 ;
+set var_seno_examen = -1 ;
+set var_resultado_examen_seno = -1 ;
+set var_implante = -1 ;
+set var_DEPO = -1 ;
+set var_pastillas = -1 ;
+
+set var_encounter_type  = -1;
+        
+		if fin=1 then
+			-- close cur_patients;
+            leave loop_patients;            
+		end if;
+
+     
+        set var_mes = date_format(sysdate(), '%Y%m%d');
+        
+        set var_ciclo_prestamo=
+        (select value_numeric from obs
+		where concept_id = ciclo_prestamo_concept_id 
+		and person_id = var_patient_id
+		and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') );
+        -- valor 0 en ciclo de prestamo si atributo ciclo de prestamo es null 
+        if (var_ciclo_prestamo is null) then
+			set  var_ciclo_prestamo = 0;
+		end if;
+			
+        set var_agencia = (    
+        select value from person_attribute
+			where person_attribute_type_id = 8
+				and voided = voided_reg
+                and person_id = var_patient_id
+                ) ;  
+        -- agrega agencia 0 si no encuentra valor del atributo agencia        
+		if var_agencia is null then
+			set var_agencia = 0; -- no se encontró agencia
+		end if;
+        
+        if ( var_ciclo_prestamo >= 3 ) then 
+			set var_elegible = 1;
+		else 
+			set var_elegible = 0;
+        end if; 
+        /*
+        
+        set var_pap_inicial = (
+        SELECT obs.value_coded FROM obs, encounter
+			WHERE 
+			obs.encounter_id = encounter.encounter_id
+			and encounter.encounter_type = 1
+			and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+			and obs.concept_id = pap_inicial_concept_id
+			and obs.value_coded = hecho_concept_value
+			and obs.person_id = var_patient_id
+			and obs.voided = voided_reg 
+			and encounter.voided = voided_reg);
+            */ 
+        begin    
+			SELECT obs.value_coded, count(obs.concept_id) into var_pap_inicial, var_cant_pap_inicial  FROM obs, encounter
+			WHERE 
+			obs.encounter_id = encounter.encounter_id
+			and encounter.encounter_type = 1
+			and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+			and obs.concept_id = pap_inicial_concept_id
+			and obs.value_coded = hecho_concept_value
+			and obs.person_id = var_patient_id
+			and obs.voided = voided_reg 
+			and encounter.voided = voided_reg
+			group by obs.value_coded, obs.concept_id, obs.person_id;
+
+			if (var_cant_pap_inicial is null ) then
+				set var_cant_pap_inicial = 0;
+			end if;
+		end;
+			/* EXAMEN PÉLVIO INICIAL O RECONSULTA */
+		begin
+			SELECT 
+			obs.value_coded,  encounter.encounter_type ,count(obs.concept_id)
+            into var_pelvico,  var_encounter_type, var_cant_pelvico
+			FROM obs, encounter
+			WHERE 
+			obs.encounter_id = encounter.encounter_id
+			-- and encounter.encounter_type = 1
+			and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+			and obs.concept_id = pelvico_concept_id
+			and obs.value_coded = hecho_concept_value
+			and obs.voided = voided_reg 
+			and encounter.voided = voided_reg
+			and obs.person_id = var_patient_id
+			group by obs.value_coded, obs.concept_id, obs.person_id;
+		
+			set var_tip_consul_pelvico = var_encounter_type;
+			/*
+			if( var_encounter_type = 1) then
+				set var_tip_consul_pelvico = 0; -- primera visita = 0, reconsulta = 1 -- otra = 3
+				
+			elseif (var_encounter_type > 1) then 
+				set var_tip_consul_pelvico = 1; -- reconsulta = 1 
+				-- set var_cant_pelvico = 0;
+			else 
+				set var_tip_consul_pelvico = -1 ;
+			end if;    */
+            
+		end; 
+            
+            select  var_numero_open, var_patient_id;
+/* 
+
+insert into  pda_pivot_report 
+        (
+        patient_id, numero_open, mes, ciclo_prestamo, agencia,elegible,tipo_consulta,pap_inicial,cant_pap_inicial,
+        pelvico,
+        cant_pelvico, 
+        tip_consul_pelvico, 
+        EIP,EIP_tratamiento,glucosa,glucosa_elevada,presion_art,presion_art_elevada,
+        prueba_embarazo,embarazo_positivo,ETS,ETS_positivo,seno_examen,resultado_examen_seno,implante,DEPO,pastillas
+        ) values (
+var_patient_id,
+var_numero_open,
+var_mes,
+var_ciclo_prestamo,
+var_agencia,
+var_elegible,
+var_tipo_consulta,
+var_pap_inicial,
+var_cant_pap_inicial,
+	var_pelvico,
+	var_cant_pelvico, 
+	var_tip_consul_pelvico,
+var_EIP,
+var_EIP_tratamiento,
+var_glucosa,
+var_glucosa_elevada,
+var_presion_art,
+var_presion_art_elevada,
+var_prueba_embarazo,
+var_embarazo_positivo,
+var_ETS,
+var_ETS_positivo,
+var_seno_examen,
+var_resultado_examen_seno,
+var_implante,
+var_DEPO,
+var_pastillas
+        );
+        commit; */
+               
+end loop loop_patients;
+    /* 
+insert into  pda_pivot_report 
+        (
+        patient_id, numero_open, mes, ciclo_prestamo, agencia,elegible,tipo_consulta,pap_inicial,cant_pap_inicial,pelvico,
+        cant_pelvico, tip_consul_pelvico, EIP,EIP_tratamiento,glucosa,glucosa_elevada,presion_art,presion_art_elevada,
+        prueba_embarazo,embarazo_positivo,ETS,ETS_positivo,seno_examen,resultado_examen_seno,implante,DEPO,pastillas
+        ) values (
+var_patient_id,
+var_numero_open,
+var_mes,
+var_ciclo_prestamo,
+var_agencia,
+var_elegible,
+var_tipo_consulta,
+var_pap_inicial,
+var_cant_pap_inicial,
+	var_pelvico,
+	var_cant_pelvico, 
+	var_tip_consul_pelvico,
+var_EIP,
+var_EIP_tratamiento,
+var_glucosa,
+var_glucosa_elevada,
+var_presion_art,
+var_presion_art_elevada,
+var_prueba_embarazo,
+var_embarazo_positivo,
+var_ETS,
+var_ETS_positivo,
+var_seno_examen,
+var_resultado_examen_seno,
+var_implante,
+var_DEPO,
+var_pastillas
+        );
+        commit;
+        */
+select  var_numero_open, var_patient_id, num_rows;
+			    
+close cur_patients;
+
+
+
+END

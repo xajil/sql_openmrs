@@ -39,7 +39,8 @@ and locale = 'es';
 -- EIP Enfermedad Inflamatoria Pélvica
 -- Examen bimanual y con espéculo: <obs conceptId="162969"/>
 /*
-Concepto llamado Examen bimanual y con espéculo, resultados y que apareza como Hecho. (concept_id= 162969 y value_coded = 162968 en la observacion) (EIP Enfermedad Inflamatoria Pélvica)
+Concepto llamado Examen bimanual y con espéculo, resultados y que apareza como Hecho. 
+(concept_id= 162969 y value_coded = 162968 en la observacion) (EIP Enfermedad Inflamatoria Pélvica)
 # clientes con EIP recibiendo tratamiento
 # pareja recibiendo EIP tratamiento
 */
@@ -61,16 +62,38 @@ select * from obs
 where concept_id = 162969
 and person_id = 186;
 
-	-- EIP Enfermedad Inflamatoria Pélvica Identificada en Primera Consulta, Ref(en ficha de Examen Pélvico e ITS existe otro concept_id =156660 que corresponde a Reconsulta)
+	-- EIP Enfermedad Inflamatoria Pélvica Identificada en Primera Consulta, 
+	-- Ref(en ficha de Examen Pélvico e ITS existe otro concept_id =156660 que corresponde a Reconsulta)
 	-- Con tratamiento obs conceptId=163057
     -- obs.value_coded= 2 = ("NO" TIENE TRATAMIENTO)
     -- obs.value_coded=1  ("SI" TIENE TRATAMIENTO)
     
+/* BUSCAR MEJOR POR REGIMEN  Y NO POR EL CONCEPTO ACA COMENTADO 
 select * from obs
 where concept_id = 163057
 and  voided=0
-and value_coded =1;
+and value_coded =1
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+;
+*/
 -- and person_id = 1604;
+
+/*DETERMINAR TRATAMIENTO DE EIP POR SU RÉGIMEN DE MEDICAMENTOS
+es mejor esta validación que la del concepto 
+*/
+select orders.patient_id,count(orders.concept_id), 
+patient_id -- , drug.name  
+from drug_order, drug, orders
+where drug_order.drug_inventory_id = drug.drug_id
+and drug_order.order_id = orders.order_id
+-- and orders.patient_id = 491
+and orders.discontinued = 1
+and orders.concept_id IN( 73041, 75222, 79782) --  juntos siempre
+and orders.start_date  between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+group by orders.patient_id
+having count(orders.concept_id) = 3
+order by orders.patient_id;
+
 
 select 
      patient_identifier.identifier, patient_identifier.* 
@@ -155,6 +178,8 @@ and  voided=0
 and value_numeric > 200
 and person_id= 678 ; 
 
+
+
 -- ejemplo: 
 select 
      patient_identifier.identifier as numero_open, patient_identifier.* 
@@ -220,8 +245,76 @@ group by value_coded
 1138    0    (Indeterminado)
 */     
     
--- # Examenes de ETS (mujeres embarazadas)
+-- Mujeres embarazadas actualmente 
+--  ESTADO DE MENSTRUACION  y 	PORQUE NO TIENE UN MÉTODO DE PLANIFICACION FAMILIAR 
+select value_coded, count(*) 
+ from obs
+where concept_id = 160596 -- ESTADO DE MENSTRUACION 
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+and value_coded = 1434
+group by value_coded
+;                    
 
+select value_coded, person_id 
+ from obs
+where concept_id = 163066 -- porque no le dio planificacion
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+and value_coded = 1434
+and obs.voided = 0
+group by value_coded, person_id;
+
+
+select  value_coded, person_id -- , count(*) 
+ from obs
+where concept_id = 160596   -- estado de menstraucion
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+and value_coded = 1434
+and obs.voided = 0
+union
+select value_coded, person_id 
+ from obs
+where concept_id = 163066 -- porque no le dio planificacion
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+and value_coded = 1434
+and obs.voided = 0
+group by value_coded, person_id
+;   
+
+-- Mujeres embarazadas actualmente 
+--  ESTADO DE MENSTRUACION  y 	PORQUE NO TIENE UN MÉTODO DE PLANIFICACION FAMILIAR 
+select  person_id -- , count(*) 
+ from obs
+where concept_id = 160596   -- estado de menstraucion
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+and value_coded = 1434
+and obs.voided = 0
+union
+select person_id 
+ from obs
+where concept_id = 163066 -- porque no le dio planificacion
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+and value_coded = 1434
+and obs.voided = 0
+UNION 
+select  person_id 
+ from obs
+where concept_id = 5272 -- EMBARAZADA ACTUALMENTE
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+and value_coded = 1065
+and obs.voided = 0
+group by  person_id
+;   
+
+
+select value_coded, count(*) 
+ from obs
+where concept_id = 160596 -- estatus de menstruación 
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+group by value_coded
+;         
+
+	
+-- # Examenes de ETS (mujeres embarazadas)
 select concept_name.* from concept
 inner join concept_name
 on concept.concept_id = concept_name.concept_id
@@ -229,11 +322,18 @@ where concept.concept_id = 162992 -- (1040 , 1619, 1322)   -- and concept_name_i
 and concept_name.voided=0
 and locale = 'es';    
     
-select value_coded, count(*)
+    
+/* TOTAL DE MUJERES CON EXAMENES ETS 
+HECHO = 1267
+NO_HECHO = 1118
+*/    
+select value_coded, obs.*
  from obs
-where concept_id = 162992 
+where concept_id = 162992 -- EXAMENES DE ETS EN MUJERES EMBARAZADA
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
 and  voided=0
-group by value_coded
+and value_coded = 1267
+-- group by value_coded
 ;
     /*
 1118	278 -- no se hizo

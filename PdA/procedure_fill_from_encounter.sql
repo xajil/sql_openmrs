@@ -1,9 +1,9 @@
-CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_pivot_report_fill`()
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_fill_from_encounter`()
 BEGIN
 
 declare var_patient_id int (11) ;
 declare var_numero_open char (50);
-declare var_mes date;
+declare var_encounter_datetime date;
 declare var_location_id int (11);
 declare var_location_name  varchar (255);
 declare var_ciclo_prestamo int (11) ;
@@ -49,8 +49,11 @@ declare var_tip_consul_embarazo int (3);
 declare var_cant_prueba_embarazo int (3);
 declare var_embarazo_positivo int (3);
 
-declare var_ETS int (3);
-declare var_ETS_positivo int (11) ;
+declare var_ets int (11);
+declare var_vih int (11);
+declare var_sifilis int (11);
+declare var_hepatitis_b int (3);
+declare var_ets_positivo int (11) ; -- cualquiera de las 3 anteriores positvo
 
 declare var_seno_examen int (11);
 declare var_tip_consul_seno int (3);
@@ -61,6 +64,11 @@ declare var_planificacion_familiar int (11);
 declare var_implante int (3) default 0;
 declare var_depo int (3) default 0;
 declare var_pastillas int (3) default 0;
+
+declare var_encounter_id int (11);
+declare var_form_id int (11);
+declare var_provider_id int (11);
+
 
 declare var_tipo_plan_fam int (11);
 declare var_tip_consul_plan_fam int (11); 
@@ -75,7 +83,7 @@ declare eip_concept_id int default 162969;
 declare eip_hecho int default 162968;
 declare eip_tratamiento_concept_id int default 163057;
 declare glucosa_concept_id int default 163130; 
-declare eip_value_con_tratamiento int default 2;
+declare eip_value_con_tratamiento int default 1;
 declare voided_reg int default 0;
 declare  var_encounter_type int (3);
 
@@ -106,12 +114,18 @@ DECLARE fin int default 0;
 
 
 declare cur_patients cursor for 
-select  patient_identifier.identifier, patient_identifier.patient_id, patient_identifier.location_id, location.name
-	from patient_identifier, location
+select  patient_identifier.identifier, patient_identifier.patient_id, encounter.location_id, location.name,
+encounter.encounter_id, encounter.encounter_datetime, encounter.encounter_type , encounter.form_id , encounter_provider.provider_id 
+	from patient_identifier, location, encounter, encounter_provider
     where patient_identifier.location_id = location.location_id
-		and voided = 0    
-        order by patient_identifier.patient_id asc
-       ; -- ,  -- en wk identifier_type = 2  para asegura que es numero_open
+		and encounter.patient_id = patient_identifier.patient_id
+        and encounter.encounter_id = encounter_provider.encounter_id
+        and encounter.encounter_datetime  between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+        and encounter.voided = 0
+        and encounter_provider.voided = 0
+		and patient_identifier.voided = 0    
+        -- and patient_identifier.patient_id = 1622
+        ; -- ,  -- en wk identifier_type = 2  para asegura que es numero_open
 --  and patient_identifier.patient_id in (  139 , 1744 , 1558, 491 , 1646,1521,110,528, 99)
 
 
@@ -131,14 +145,14 @@ select FOUND_ROWS () into num_rows;
 
 	loop_patients: loop
 		
-        fetch cur_patients into var_numero_open, var_patient_id, var_location_id,var_location_name;
+        fetch cur_patients into var_numero_open, var_patient_id, var_location_id,var_location_name, var_encounter_id, var_encounter_datetime, var_tipo_consulta, var_form_id, var_provider_id ;
         
         if fin=1 then
 			leave loop_patients;            
 		end if;
         
         -- fecha de reporte
-        set var_mes = date_format(sysdate(), '%Y%m%d');
+        -- set var_mes = date_format(sysdate(), '%Y%m%d');
         
         select ifnull(
         (
@@ -146,6 +160,7 @@ select FOUND_ROWS () into num_rows;
 		where concept_id = ciclo_prestamo_concept_id 
 		and person_id = var_patient_id
         and obs.voided  = 0
+        and obs.encounter_id = var_encounter_id
 		and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
         
         )
@@ -159,11 +174,15 @@ select FOUND_ROWS () into num_rows;
 		where concept_id = 163138 --  ciclo_prestamo_concept_id 
 		and person_id = var_patient_id
 		and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+        -- and obs.encounter_id = var_encounter_id
+        and obs.voided  = 0
         and obs.date_created = (
 			select max(obs.date_created) 
 			from obs
 			where concept_id = 163138 --  ciclo_prestamo_concept_id 
 			and person_id = var_patient_id
+            -- and obs.encounter_id = var_encounter_id
+            and obs.voided  = 0
 			and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
         )
         ;
@@ -212,6 +231,7 @@ select FOUND_ROWS () into num_rows;
 			and obs.value_coded = hecho_concept_value
 			and obs.person_id = var_patient_id
 			and obs.voided = voided_reg 
+            and obs.encounter_id = var_encounter_id
 			and encounter.voided = voided_reg
             )
     , 0 ) INTO existe_pap_inicial ; 
@@ -227,6 +247,7 @@ select FOUND_ROWS () into num_rows;
 			and obs.person_id = var_patient_id
 			and obs.voided = voided_reg 
 			and encounter.voided = voided_reg
+            and obs.encounter_id = var_encounter_id
 			group by obs.value_coded, encounter.encounter_type, obs.concept_id, obs.person_id;
 	else 
     set var_pap_inicial = -1;
@@ -246,6 +267,7 @@ select FOUND_ROWS () into num_rows;
 			and obs.value_coded = hecho_concept_value
 			and obs.person_id = var_patient_id
 			and obs.voided = voided_reg 
+            and obs.encounter_id = var_encounter_id
 			and encounter.voided = voided_reg
             )
     , 0 ) INTO existe_ex_pelvico ; 
@@ -264,6 +286,7 @@ select FOUND_ROWS () into num_rows;
 			and obs.voided = voided_reg 
 			and encounter.voided = voided_reg
 			and obs.person_id = var_patient_id
+            and obs.encounter_id = var_encounter_id
 			group by obs.value_coded, encounter.encounter_type, obs.concept_id, obs.person_id;
 	else 
 		set var_pelvico = -1;
@@ -282,6 +305,7 @@ select FOUND_ROWS () into num_rows;
 			and value_coded = eip_hecho
 			and obs.person_id = var_patient_id
 			and obs.voided = voided_reg
+            and obs.encounter_id = var_encounter_id
 			and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
 			), 0) into existe_eip ;
 
@@ -296,6 +320,7 @@ select FOUND_ROWS () into num_rows;
 			and value_coded = eip_hecho
 			and obs.person_id = var_patient_id
 			and obs.voided = voided_reg
+            and obs.encounter_id = var_encounter_id
 			and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
             group by obs.value_coded, encounter.encounter_type, obs.concept_id, obs.person_id;
     else
@@ -312,6 +337,7 @@ where concept_id = eip_tratamiento_concept_id
 and obs.person_id = var_patient_id
 and  voided=voided_reg
 and value_coded =eip_value_con_tratamiento -- tiene tratamieto asignado 
+and obs.encounter_id = var_encounter_id
 and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
 )
 , 0 )into existe_tratamiento_eip;
@@ -322,6 +348,7 @@ where obs.concept_id = eip_tratamiento_concept_id
 and obs.person_id = var_patient_id
 and  voided=voided_reg
 and value_coded =eip_value_con_tratamiento -- tiene tratamieto asignado 
+and obs.encounter_id = var_encounter_id
 and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
 group by obs.value_coded,  obs.concept_id, obs.person_id; 
 -- obs.concept_id,
@@ -373,6 +400,7 @@ end if;
 				-- and value_coded = hecho_concept_value
 				and obs.person_id = var_patient_id
 				and obs.voided = voided_reg
+                and obs.encounter_id = var_encounter_id
 				and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
 				),0 ) into existe_glucosa_ayunas;
 				
@@ -389,6 +417,7 @@ end if;
 				and obs.voided = voided_reg 
 				and encounter.voided = voided_reg
 				and obs.person_id = var_patient_id
+                and obs.encounter_id = var_encounter_id
 				and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
 				group by encounter.encounter_type , obs.concept_id, obs.person_id;            
                 
@@ -408,6 +437,7 @@ end if;
 					-- and value_coded = hecho_concept_value
 					and obs.person_id = var_patient_id
 					and obs.voided = voided_reg
+                    and obs.encounter_id = var_encounter_id
 					and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
 					),
 					0
@@ -424,6 +454,7 @@ end if;
 				and obs.voided = voided_reg 
 				and encounter.voided = voided_reg
 				and obs.person_id = var_patient_id
+                and obs.encounter_id = var_encounter_id
 				and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
 				group by encounter.encounter_type , obs.concept_id, obs.person_id;      
 					else 
@@ -451,6 +482,7 @@ end if;
 					and concept_id = 5085 -- sistolica
 					and obs.person_id = var_patient_id
 					and obs.voided = voided_reg
+                    and obs.encounter_id = var_encounter_id
 					and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
                     )
         , 0) into existe_sistolica;
@@ -467,6 +499,7 @@ end if;
 				and obs.voided = voided_reg 
 				and encounter.voided = voided_reg
 				and obs.person_id = var_patient_id
+                and obs.encounter_id = var_encounter_id
 				and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
 				group by encounter.encounter_type, obs.concept_id, obs.person_id;  
         else
@@ -485,6 +518,7 @@ end if;
 					and concept_id = 5086 -- diastolica
 					and obs.person_id = var_patient_id
 					and obs.voided = voided_reg
+                    and obs.encounter_id = var_encounter_id
 					and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
                     )
         , 0) into existe_diastolica;
@@ -501,6 +535,7 @@ end if;
 				and obs.voided = voided_reg 
 				and encounter.voided = voided_reg
 				and obs.person_id = var_patient_id
+                and obs.encounter_id = var_encounter_id
 				and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
 				group by encounter.encounter_type, obs.concept_id, obs.person_id;  
         else
@@ -529,12 +564,14 @@ end if;
                     AND obs.value_coded in (664, 703, 1304,1138 )
 					and obs.person_id = var_patient_id
 					and obs.voided = voided_reg
+                    and obs.encounter_id = var_encounter_id
 					and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
                     )
         , 0) into existe_prueba_embarazo;
         
 			if (existe_prueba_embarazo > 0) then
-				SELECT 
+				/*
+                SELECT 
 				obs.value_coded,  encounter.encounter_type ,count(obs.concept_id)
 				into var_prueba_embarazo,  var_tip_consul_embarazo, var_cant_prueba_embarazo
 				FROM obs, encounter
@@ -548,7 +585,10 @@ end if;
                --  and obs.value_coded <> 1118
 				and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
 				group by obs.value_coded, obs.concept_id, obs.person_id;  
-                
+                */
+				set var_prueba_embarazo = 1;
+				set var_tip_consul_embarazo = 1;
+				set var_cant_prueba_embarazo = 1;
             else 
 				set var_prueba_embarazo = -1;
 				set var_tip_consul_embarazo = -1;
@@ -579,6 +619,7 @@ end if;
 					and concept_id = 159780 -- EXAMEN SENO 
 					and obs.person_id = var_patient_id
 					and obs.voided = voided_reg
+                    and obs.encounter_id = var_encounter_id
 					and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
                     )
         , 0) into existe_examen_seno;
@@ -594,6 +635,7 @@ end if;
 				and obs.voided = voided_reg 
 				and encounter.voided = voided_reg
 				and obs.person_id = var_patient_id
+                and obs.encounter_id = var_encounter_id
 				and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
 				group by obs.value_coded, obs.concept_id, obs.person_id;  
         else
@@ -618,6 +660,7 @@ end if;
 					and concept_id = 162971 -- PLANIFICACION FAMILIAR
 					and obs.person_id = var_patient_id
 					and obs.voided = voided_reg
+                    and obs.encounter_id = var_encounter_id
 					and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
                     )
         , 0) into existe_plan_familiar;
@@ -633,6 +676,7 @@ end if;
 				and obs.voided = voided_reg 
 				and encounter.voided = voided_reg
 				and obs.person_id = var_patient_id
+                and obs.encounter_id = var_encounter_id
 				and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
 				group by obs.value_coded, obs.concept_id, obs.person_id;              
             
@@ -678,7 +722,7 @@ end if;
         
         insert into  pda_pivot_report 
         (
-        patient_id, numero_open, mes, location_id, location_name, ciclo_prestamo, agencia,elegible,tipo_consulta,
+        patient_id, numero_open, encounter_datetime, location_id, location_name, ciclo_prestamo, agencia,elegible,tipo_consulta,
         pap_inicial,cant_pap_inicial,tip_consul_pap,
         pelvico,cant_pelvico, tip_consul_pelvico, 
         eip, tip_consul_eip, cant_eip, eip_tratamiento,
@@ -715,12 +759,16 @@ resultado_examen_seno,
 planificacion_familiar,
 implante,
 depo,
-pastillas
+pastillas,
+encounter_id,
+form_id,
+provider_id
+
 
         ) values (
 var_patient_id,
 var_numero_open,
-var_mes,
+var_encounter_datetime,
 var_location_id,
 var_location_name,
 var_ciclo_prestamo,
@@ -774,8 +822,10 @@ var_resultado_examen_seno,
 var_planificacion_familiar,
 var_implante,
 var_depo,
-var_pastillas
-
+var_pastillas,
+var_encounter_id,
+var_form_id,
+var_provider_id
 
         );
         
