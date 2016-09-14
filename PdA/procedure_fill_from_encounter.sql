@@ -12,40 +12,40 @@ declare var_elegible int (5) ;
 declare var_tipo_consulta int (5) ;
 
 declare var_pap_inicial int (11) ;
-declare var_tip_consul_pap int (3);
+-- declare var_tip_consul_pap int (3);
 declare var_cant_pap_inicial int (5) ;
 
 declare var_pelvico int (11);
-declare var_tip_consul_pelvico int(3);
+-- declare var_tip_consul_pelvico int(3);
 declare var_cant_pelvico int (5);
 
 declare var_eip int (11);
-declare var_tip_consul_eip int (3);
+-- declare var_tip_consul_eip int (3);
 declare var_cant_eip int (3);
 declare var_eip_tratamiento int (3);
 
 declare var_glucosa_ayunas int (11);
-declare var_tip_consul_glucosa_ayunas int (3);
+-- declare var_tip_consul_glucosa_ayunas int (3);
 declare var_cant_glucosa_ayunas int (3);
 
 declare var_glucosa_azar int (11);
-declare var_tip_consul_glucosa_azar int (3);
+-- declare var_tip_consul_glucosa_azar int (3);
 declare var_cant_glucosa_azar int (3);
 
 declare var_glucosa_elevada int (3);
 	-- PRESION ARTERIAL SISTOLICA
 		declare var_presion_sistolica int (11);
-		declare var_tip_consul_sistolica int (3);
+	-- 	declare var_tip_consul_sistolica int (3);
 		declare var_cant_sistolica int (3);
    	-- PRESION ARTRRIAL DIASTOLICA
 		declare var_presio_diastolica int (11);
-		declare var_tip_consul_diastolica int (3);
+	-- declare var_tip_consul_diastolica int (3);
 		declare var_cant_diastolica int (3);
 	-- PRESION ELEVADA
 		declare var_presion_art_elevada int (3);
 -- PRUEBAS DE EMBARAZO        
 declare var_prueba_embarazo int (11);
-declare var_tip_consul_embarazo int (3);
+-- declare var_tip_consul_embarazo int (3);
 declare var_cant_prueba_embarazo int (3);
 declare var_embarazo_positivo int (3);
 
@@ -56,7 +56,7 @@ declare var_hepatitis_b int (3);
 declare var_ets_positivo int (11) ; -- cualquiera de las 3 anteriores positvo
 
 declare var_seno_examen int (11);
-declare var_tip_consul_seno int (3);
+-- declare var_tip_consul_seno int (3);
 declare var_cant_examen_seno int (3);
 declare var_resultado_examen_seno int (11);
 
@@ -71,7 +71,7 @@ declare var_provider_id int (11);
 
 
 declare var_tipo_plan_fam int (11);
-declare var_tip_consul_plan_fam int (11); 
+-- declare var_tip_consul_plan_fam int (11); 
 declare var_cant_plan_fam int (11);
 
 
@@ -105,6 +105,10 @@ declare existe_prueba_embarazo int default 0;
 declare existe_obs_embarazada int default 0; -- AÚN NO UTILIZADO
 declare existe_examen_seno int default 0;
 declare existe_plan_familiar int default 0;
+declare existe_pruebas_ets int default 0;
+declare existe_prueba_vih int default 0;
+declare existe_prueba_sifilis int default 0;
+declare existe_prueba_hepatitis int default 0;
 
 declare num_rows int default 0;
 declare loop_ctrl int default 0;
@@ -237,8 +241,10 @@ select FOUND_ROWS () into num_rows;
     , 0 ) INTO existe_pap_inicial ; 
     
     if (existe_pap_inicial > 0 )then 
-			SELECT obs.value_coded, encounter.encounter_type, count(obs.concept_id) 
-            into var_pap_inicial, var_tip_consul_pap, var_cant_pap_inicial  FROM obs, encounter
+			SELECT obs.value_coded, -- encounter.encounter_type, 
+            count(obs.concept_id) 
+            into var_pap_inicial,   -- var_tip_consul_pap, 
+            var_cant_pap_inicial  FROM obs, encounter
 			WHERE 
 			obs.encounter_id = encounter.encounter_id
 			and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
@@ -251,7 +257,7 @@ select FOUND_ROWS () into num_rows;
 			group by obs.value_coded, encounter.encounter_type, obs.concept_id, obs.person_id;
 	else 
     set var_pap_inicial = -1;
-    set var_tip_consul_pap = -1;
+    -- set var_tip_consul_pap = -1;
     set var_cant_pap_inicial = -1;
     end if; 
 		
@@ -275,8 +281,10 @@ select FOUND_ROWS () into num_rows;
     
     if ( existe_ex_pelvico > 0) then
 			SELECT 
-			obs.value_coded,  encounter.encounter_type ,count(obs.concept_id)
-            into var_pelvico,  var_tip_consul_pelvico, var_cant_pelvico
+			obs.value_coded,  		-- encounter.encounter_type ,
+            count(obs.concept_id)
+            into var_pelvico,  		-- var_tip_consul_pelvico, 
+            var_cant_pelvico
 			FROM obs, encounter
 			WHERE 
 			obs.encounter_id = encounter.encounter_id
@@ -290,7 +298,7 @@ select FOUND_ROWS () into num_rows;
 			group by obs.value_coded, encounter.encounter_type, obs.concept_id, obs.person_id;
 	else 
 		set var_pelvico = -1;
-		set var_tip_consul_pelvico = -1;
+		-- set var_tip_consul_pelvico = -1;
 		set var_cant_pelvico = -1;		
     end if ;
 
@@ -311,8 +319,10 @@ select FOUND_ROWS () into num_rows;
 
 	if existe_eip > 0 then
     select 
-    obs.value_coded,  encounter.encounter_type ,count(obs.concept_id)
-    into var_eip, var_tip_consul_eip,var_cant_eip
+    obs.value_coded, 	 -- encounter.encounter_type ,
+    count(obs.concept_id)
+    into var_eip, 		-- var_tip_consul_eip,
+    var_cant_eip
     from obs, encounter
 			where obs.encounter_id = encounter.encounter_id
 			-- and encounter.encounter_type = 2
@@ -325,7 +335,7 @@ select FOUND_ROWS () into num_rows;
             group by obs.value_coded, encounter.encounter_type, obs.concept_id, obs.person_id;
     else
 	set var_eip = -1;
-	set var_tip_consul_eip = -1;
+	-- set var_tip_consul_eip = -1;
 	set var_cant_eip = -1;
     end if;
     
@@ -408,8 +418,10 @@ end if;
 				if (existe_glucosa_ayunas > 0) then                
                 
 				SELECT 
-				max(obs.value_numeric),  encounter.encounter_type ,count(obs.concept_id)
-				into var_glucosa_ayunas,  var_tip_consul_glucosa_ayunas, var_cant_glucosa_ayunas
+				max(obs.value_numeric), 	-- encounter.encounter_type ,
+                count(obs.concept_id)
+				into var_glucosa_ayunas,  	-- var_tip_consul_glucosa_ayunas, 
+                var_cant_glucosa_ayunas
 				FROM obs, encounter
 				WHERE 
 				obs.encounter_id = encounter.encounter_id
@@ -423,7 +435,7 @@ end if;
                 
 				else 
                     set var_glucosa_ayunas = -1 ;
-					set var_tip_consul_glucosa_ayunas= -1 ;
+					-- set var_tip_consul_glucosa_ayunas= -1 ;
 					set var_cant_glucosa_ayunas= -1 ;
 				end if;
             
@@ -445,8 +457,10 @@ end if;
 					-- declare azar_glucosa_valor int (11);
 					if (existe_glucosa_azar > 0) then
 				SELECT 
-				max(obs.value_numeric),  encounter.encounter_type ,count(obs.concept_id)
-				into var_glucosa_azar,  var_tip_consul_glucosa_azar, var_cant_glucosa_azar
+				max(obs.value_numeric),  -- encounter.encounter_type ,
+                count(obs.concept_id)
+				into var_glucosa_azar,   -- var_tip_consul_glucosa_azar, 
+                var_cant_glucosa_azar
 				FROM obs, encounter
 				WHERE 
 				obs.encounter_id = encounter.encounter_id
@@ -460,7 +474,7 @@ end if;
 					else 
 					-- set azar_glucosa_valor = 0;
                     set var_glucosa_azar = -1 ;
-					set var_tip_consul_glucosa_azar= -1 ;
+					-- set var_tip_consul_glucosa_azar= -1 ;
 					set var_cant_glucosa_azar= -1 ;
 
 					end if ;
@@ -490,8 +504,10 @@ end if;
         
         if (existe_sistolica > 0) then
 				SELECT 
-				max(obs.value_numeric),  encounter.encounter_type ,count(obs.concept_id)
-				into var_presion_sistolica,  var_tip_consul_sistolica, var_cant_sistolica
+				max(obs.value_numeric),  	-- encounter.encounter_type ,
+                count(obs.concept_id)
+				into var_presion_sistolica, -- var_tip_consul_sistolica, 
+                var_cant_sistolica
 				FROM obs, encounter
 				WHERE 
 				obs.encounter_id = encounter.encounter_id
@@ -504,7 +520,7 @@ end if;
 				group by encounter.encounter_type, obs.concept_id, obs.person_id;  
         else
         set var_presion_sistolica = -1;
-        set var_tip_consul_sistolica = -1;
+        -- set var_tip_consul_sistolica = -1;
         set var_cant_sistolica = -1;
         end if; 
 
@@ -526,8 +542,10 @@ end if;
         
         if (existe_diastolica > 0) then
 				SELECT 
-				max(obs.value_numeric),  encounter.encounter_type ,count(obs.concept_id)
-				into var_presio_diastolica,  var_tip_consul_diastolica, var_cant_diastolica
+				max(obs.value_numeric),  	-- encounter.encounter_type ,
+                count(obs.concept_id)
+				into var_presio_diastolica, -- var_tip_consul_diastolica, 
+                var_cant_diastolica
 				FROM obs, encounter
 				WHERE 
 				obs.encounter_id = encounter.encounter_id
@@ -540,7 +558,7 @@ end if;
 				group by encounter.encounter_type, obs.concept_id, obs.person_id;  
         else
         set var_presio_diastolica = -1;
-        set var_tip_consul_diastolica = -1;
+        -- set var_tip_consul_diastolica = -1;
         set var_cant_diastolica = -1;
         end if;         
         
@@ -587,11 +605,11 @@ end if;
 				group by obs.value_coded, obs.concept_id, obs.person_id;  
                 */
 				set var_prueba_embarazo = 1;
-				set var_tip_consul_embarazo = 1;
+				-- set var_tip_consul_embarazo = 1;
 				set var_cant_prueba_embarazo = 1;
             else 
 				set var_prueba_embarazo = -1;
-				set var_tip_consul_embarazo = -1;
+				-- set var_tip_consul_embarazo = -1;
 				set var_cant_prueba_embarazo = -1;
             end if;
             
@@ -626,8 +644,10 @@ end if;
         
         if (existe_examen_seno > 0) then
         SELECT 
-				obs.value_coded,  encounter.encounter_type ,count(obs.concept_id)
-				into var_seno_examen,  var_tip_consul_seno, var_cant_examen_seno
+				obs.value_coded,  		-- encounter.encounter_type ,
+                count(obs.concept_id)
+				into var_seno_examen,  	-- var_tip_consul_seno, 
+                var_cant_examen_seno
 				FROM obs, encounter
 				WHERE 
 				obs.encounter_id = encounter.encounter_id
@@ -640,7 +660,7 @@ end if;
 				group by obs.value_coded, obs.concept_id, obs.person_id;  
         else
 				set var_seno_examen = -1;
-				set var_tip_consul_seno = -1;
+				-- set var_tip_consul_seno = -1;
 				set var_cant_examen_seno = -1;
         end if;
    
@@ -667,8 +687,10 @@ end if;
         
         if( existe_plan_familiar > 0) then
 				SELECT 
-				obs.value_coded,  encounter.encounter_type ,count(obs.concept_id)
-				into var_tipo_plan_fam,  var_tip_consul_plan_fam, var_cant_plan_fam
+				obs.value_coded,  			-- encounter.encounter_type ,
+                count(obs.concept_id)
+				into var_tipo_plan_fam,  	-- var_tip_consul_plan_fam, 
+                var_cant_plan_fam
 				FROM obs, encounter
 				WHERE 
 				obs.encounter_id = encounter.encounter_id
@@ -687,7 +709,7 @@ end if;
         else
 			set var_planificacion_familiar = 0;
             set var_tipo_plan_fam = -1;
-			set var_tip_consul_plan_fam = -1;
+			-- set var_tip_consul_plan_fam = -1;
 			set var_cant_plan_fam = -1;
         end if; 
         
@@ -711,8 +733,111 @@ end if;
         end if;
         
         
+-- DETERMINAR SI SE HIZO PREUBAS ETS
+select ifnull(
+(select count(person_id) from obs, encounter
+where 
+encounter.encounter_id = obs.encounter_id
+and obs.encounter_id = var_encounter_id
+and obs.person_id = var_patient_id
+and concept_id = 162992 -- ETS HECHO
+and obs.value_coded = 1267
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+and obs.voided = 0), 
+0 ) into existe_pruebas_ets ;
 
- 
+ if (existe_pruebas_ets > 0) then
+	select value_coded into var_ets
+		from obs, encounter
+	where encounter.encounter_id = obs.encounter_id
+    and obs.encounter_id = var_encounter_id
+    and obs.person_id = var_patient_id
+	and concept_id = 162992 -- ETS HECHO
+	and obs.value_coded = 1267
+	and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+	and obs.voided = 0;
+ else 
+	set var_ets= -1;
+ end if;
+
+
+-- DETERMINAR PRUBAS VIH 
+-- into existe_prueba_vih
+select ifnull(
+(select count(person_id) from obs, encounter
+where encounter.encounter_id = obs.encounter_id
+and obs.encounter_id = var_encounter_id
+and obs.person_id = var_patient_id
+and concept_id = 1040 -- EXAMENES VIH
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+and obs.voided = 0), 
+0 ) into existe_prueba_vih ;
+
+if (existe_prueba_vih > 0) then
+select value_coded 
+into var_vih
+from obs, encounter
+where encounter.encounter_id = obs.encounter_id
+and obs.encounter_id = var_encounter_id
+and obs.person_id = var_patient_id
+and concept_id = 1040 -- EXAMENES VIH
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+and obs.voided = 0; 
+else
+set var_vih = -1;
+end if; 
+        
+
+-- DETERMINAR SIFILIS
+select ifnull(
+(select count(person_id) from obs, encounter
+where encounter.encounter_id = obs.encounter_id
+and obs.encounter_id = var_encounter_id
+and obs.person_id = var_patient_id
+and concept_id = 1619 -- EXAMENES DE Sífilis
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+and obs.voided = 0), 
+0 ) into existe_prueba_sifilis ;
+
+if (existe_prueba_sifilis > 0) then
+select value_coded 
+into var_sifilis 
+from obs, encounter
+where encounter.encounter_id = obs.encounter_id
+and obs.encounter_id = var_encounter_id
+and obs.person_id = var_patient_id
+and concept_id = 1619 -- EXAMENES DE Sífilis
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+and obs.voided = 0; 
+else
+set var_sifilis = -1;
+end if; 
+        
+-- DETERMINAR HEPATITIS_B
+select ifnull(
+(select count(person_id) from obs, encounter
+where encounter.encounter_id = obs.encounter_id
+and obs.encounter_id = var_encounter_id
+and obs.person_id = var_patient_id
+and concept_id = 1322 -- EXAMENES DE Sífilis
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+and obs.voided = 0), 
+0 ) into existe_prueba_hepatitis ;
+
+if (existe_prueba_hepatitis > 0) then
+select value_coded 
+into var_hepatitis_b 
+from obs, encounter
+where encounter.encounter_id = obs.encounter_id
+and obs.encounter_id = var_encounter_id
+and obs.person_id = var_patient_id
+and concept_id = 1322 -- EXAMENES DE Sífilis
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+and obs.voided = 0; 
+else
+set var_hepatitis_b = -1;
+end if; 
+
 
         
 		-- select  var_numero_open, var_patient_id, var_ciclo_prestamo, var_agencia, var_elegible,
@@ -722,37 +847,43 @@ end if;
         
         insert into  pda_pivot_report 
         (
-        patient_id, numero_open, encounter_datetime, location_id, location_name, ciclo_prestamo, agencia,elegible,tipo_consulta,
-        pap_inicial,cant_pap_inicial,tip_consul_pap,
-        pelvico,cant_pelvico, tip_consul_pelvico, 
-        eip, tip_consul_eip, cant_eip, eip_tratamiento,
+        patient_id, numero_open, encounter_id,  encounter_datetime, location_id, location_name, ciclo_prestamo, agencia,elegible,tipo_consulta,
+        pap_inicial,cant_pap_inicial,-- tip_consul_pap,
+        pelvico,cant_pelvico, -- tip_consul_pelvico, 
+        eip, -- tip_consul_eip, 
+        cant_eip, eip_tratamiento,
 
 glucosa_ayunas,
-tip_consul_glucosa_ayunas,
+-- tip_consul_glucosa_ayunas,
 cant_glucosa_ayunas,
 glucosa_azar,
-tip_consul_glucosa_azar,
+-- tip_consul_glucosa_azar,
 cant_glucosa_azar,
 glucosa_elevada,
         
 presion_sistolica,
-tip_consul_sistolica,
+-- tip_consul_sistolica,
 cant_sistolica,
 presio_diastolica,
-tip_consul_diastolica,
+-- tip_consul_diastolica,
 cant_diastolica,
 presion_art_elevada,
 
 prueba_embarazo ,
-tip_consul_embarazo,
+-- tip_consul_embarazo,
 cant_prueba_embarazo,
 
 embarazada_o_examen_positivo,
 
-ETS,ETS_positivo,
+ets,
+vih,
+sifilis,
+hepatitis_b,
+ets_positivo,
+
 
 seno_examen,
-tip_consul_seno,
+-- tip_consul_seno,
 cant_examen_seno,
 resultado_examen_seno,
 
@@ -760,7 +891,6 @@ planificacion_familiar,
 implante,
 depo,
 pastillas,
-encounter_id,
 form_id,
 provider_id
 
@@ -768,6 +898,7 @@ provider_id
         ) values (
 var_patient_id,
 var_numero_open,
+var_encounter_id,
 var_encounter_datetime,
 var_location_id,
 var_location_name,
@@ -778,44 +909,48 @@ var_tipo_consulta,
 
 var_pap_inicial,
 var_cant_pap_inicial,
-var_tip_consul_pap,
+-- var_tip_consul_pap,
 
 	var_pelvico,
 	var_cant_pelvico, 
-	var_tip_consul_pelvico,
+	-- var_tip_consul_pelvico,
     
 var_eip,
-var_tip_consul_eip,
+-- var_tip_consul_eip,
 var_cant_eip,
 var_eip_tratamiento,
 
 var_glucosa_ayunas,
-var_tip_consul_glucosa_ayunas,
+-- var_tip_consul_glucosa_ayunas,
 var_cant_glucosa_ayunas,
 var_glucosa_azar,
-var_tip_consul_glucosa_azar,
+-- var_tip_consul_glucosa_azar,
 var_cant_glucosa_azar,
 var_glucosa_elevada,
 
 
 var_presion_sistolica,
-var_tip_consul_sistolica,
+-- var_tip_consul_sistolica,
 var_cant_sistolica,
 var_presio_diastolica,
-var_tip_consul_diastolica,
+-- var_tip_consul_diastolica,
 var_cant_diastolica,
 var_presion_art_elevada,
 
 var_prueba_embarazo,
-var_tip_consul_embarazo,
+-- var_tip_consul_embarazo,
 var_cant_prueba_embarazo,
 
 var_embarazo_positivo,
-var_ETS,
-var_ETS_positivo,
+
+var_ets,
+var_vih,
+var_sifilis,
+var_hepatitis_b,
+var_ets_positivo,
 
 var_seno_examen,
-var_tip_consul_seno,
+-- var_tip_consul_seno,
 var_cant_examen_seno,
 var_resultado_examen_seno,
 
@@ -823,7 +958,7 @@ var_planificacion_familiar,
 var_implante,
 var_depo,
 var_pastillas,
-var_encounter_id,
+
 var_form_id,
 var_provider_id
 

@@ -105,7 +105,7 @@ and obs.voided = 0
 ) ;
 
 
--- EXAMEN DE PAPA NO HECHO EN PAPA INICIAL
+-- EXAMEN DE PAP NO HECHO EN PAP INICIAL
 SELECT obs.person_id,  obs.concept_id, obs.value_coded FROM  obs 
 WHERE 
 -- obs.value_coded <> 1267
@@ -409,6 +409,128 @@ and value_coded in( 163096, 162975, 162976, 162977 )
 and form_id = 12 
 ;
 
+-- PAP REPETIDO
+-- examenes de pap inicial realizados en reconsutas, 
+-- que aparezca una obs con concept_id = 162978 con value_coded = 1267 (realizado)   
+-- y quetenga un pap en primera visita (obs con concept_id = 162972 y con value_coded <> 1267
+
+SELECT obs.person_id,  obs.concept_id, obs.value_coded FROM  obs, encounter
+WHERE 
+obs.encounter_id = encounter.encounter_id
+-- obs.value_coded <> 1267
+and obs.concept_id = 162978 -- pap repetido 
+and obs.value_coded = 1267 -- pap repetido hecho 
+and obs.voided = 0
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+and exists (
+SELECT anidado.person_id FROM  obs anidado, encounter
+WHERE 
+anidado.encounter_id = encounter.encounter_id
+-- obs.value_coded <> 1267
+and anidado.concept_id = 162972 -- papa inicial
+and anidado.value_coded = 1267 -- pap inical hecho
+and anidado.voided = 0
+and anidado.person_id = obs.person_id
+-- and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+)
+;
+
+
+-- segunda toma de glucosas
+-- union de glucosa en ayunas y al azar con algún valor.
+select obs.*
+ from obs, encounter
+where 
+obs.encounter_id = encounter.encounter_id
+and encounter.encounter_type = 2
+and concept_id = 160912
+and  obs.voided=0
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+-- and value_numeric > 126
+-- and person_id= 1521
+union 
+select  obs.*
+ from
+  obs, encounter
+where 
+obs.encounter_id = encounter.encounter_id
+and encounter.encounter_type = 2
+and
+concept_id = 887
+and  obs.voided=0
+-- and value_numeric > 200
+-- and person_id= 678 
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+; 
+
+
+-- DIAGNOSTICO DE DIABETES
+-- TODAS LAS INSCRITAS EN PROGRAMA DIABETES
+SELECT * FROM patient, patient_program
+where patient.patient_id = patient_program.patient_id
+and patient_program.program_id = 13
+and date_enrolled between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+;
+
+
+-- diabetes con diagnósitco previo
+select obs.*
+ from obs, encounter
+where 
+obs.encounter_id = encounter.encounter_id
+-- and encounter.encounter_type = 2
+and concept_id = 162989
+and value_coded = 119481
+and  obs.voided=0
+and exists (
+SELECT patient.patient_id FROM patient, patient_program
+where patient.patient_id = patient_program.patient_id
+and patient_program.program_id = 13
+and obs.person_id = patient.patient_id
+and date_enrolled between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+)
+;
+
+
+/* no vale para glucosa porque no todas la fichas tienen casilla de hecho y no hecho */
+SELECT obs.person_id,  obs.concept_id, obs.value_coded hecho FROM  obs, encounter
+WHERE 
+obs.encounter_id = encounter.encounter_id
+-- obs.value_coded <> 1267
+and obs.concept_id = 163130 -- segunda glucosa
+and obs.value_coded = 1267 -- segunda glucosa hecho 
+and obs.voided = 0
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+and encounter.encounter_type = 2 -- ;
+union 
+SELECT obs.person_id,  obs.concept_id,  value_numeric hecho FROM  obs, encounter
+WHERE 
+obs.encounter_id = encounter.encounter_id
+-- obs.value_coded <> 1267
+and obs.concept_id = 160912 -- segunda glucosa ficha de laboratorios
+and obs.value_numeric is not null --  = 1267 -- segunda glucosa hecho 
+and obs.voided = 0
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+and encounter.encounter_type = 2
+;
+-- 
+
+
+
+
+SELECT obs.person_id,  obs.concept_id,  value_numeric hecho FROM  obs, encounter
+WHERE 
+obs.encounter_id = encounter.encounter_id
+-- obs.value_coded <> 1267
+and obs.concept_id = 160912 -- segunda glucosa ficha de laboratorios
+and obs.value_numeric is not null --  = 1267 -- segunda glucosa hecho 
+and obs.voided = 0
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+and encounter.encounter_type = 2
+;
+
+
+
 
 
 /**********************************************************************************************/
@@ -433,4 +555,3 @@ and drug_order.order_id = orders.order_id
 and orders.patient_id = 1497 
 and orders.discontinued = 1
 order by orders.patient_id;
-

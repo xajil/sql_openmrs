@@ -4,6 +4,11 @@ truncate table pda_pivot_report;
 -- call proc_pivot_report_fill;     
 call proc_fill_from_encounter;
 -- 4570 
+-- total de 730 encuentros.
+-- total de 738 encuentro 
+
+select pda_pivot_report.* from pda_pivot_report;
+
 
 TRUNCATE TABLE error_log_pda_repo;
 select * from error_log_pda_repo;
@@ -60,4 +65,24 @@ and provider_id <> 18
 and pda_pivot_report.tipo_consulta = 1
 group by patient_id, pda_pivot_report.encounter_datetime
 ;
+
+select value_coded, obs.*
+ from obs
+where concept_id = 1619 -- EXAMENES DE ETS EN MUJERES EMBARAZADA
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+and  voided=0
+-- and value_coded = 1267
+-- group by value_coded
+;
+
+
+select value_coded 
+-- into var_sifilis 
+from obs, encounter
+where encounter.encounter_id = obs.encounter_id
+and obs.encounter_id = encounter.encounter_id
+-- and obs.person_id = var_patient_id
+and concept_id = 1619 -- EXAMENES DE Sífilis
+and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+and obs.voided = 0;
 
