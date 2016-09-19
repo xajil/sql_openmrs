@@ -62,7 +62,7 @@ prueba_embarazo  int (11),
 -- tip_consul_embarazo  int (3),
 cant_prueba_embarazo  int (3),
 
-embarazada_o_examen_positivo  int (3),
+embarazada  int (3),
 
 ets  int (11),
 vih  int (11),

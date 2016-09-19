@@ -28,6 +28,23 @@ select provider.provider_id,  b.* from provider , -- Cantidad de pacientes por p
 ) b
 where provider.provider_id = b.provider_id;
 
+-- cantidad de pacientes embarazadas por proveedor
+-- proviene del campo embarazada_o_examen_positivo que contiene las mujeres con examen positivo más 
+-- las que sin examen son diagnosticadas como embarazadas.
+select provider_id, provider_name,  count(embarazada) embarazada from (
+	select   patient_id, embarazada , encounter_datetime, provider_id, provider_name  from
+	pda_pivot_report
+    where embarazada = 1
+ ) a
+where provider_id not in (18, 17)
+group by provider_id
+;
+
+select  embarazada_o_examen_positivo, count(embarazada_o_examen_positivo) from pda_pivot_report
+group by embarazada_o_examen_positivo;
+
+
+
 -- Cantidad de pruebas de clugosa por proveedro 
 select provider_id, provider_name,  count(glucosa) glucosa from (
 	select   patient_id, glucosa_azar glucosa, encounter_datetime, provider_id, provider_name  from

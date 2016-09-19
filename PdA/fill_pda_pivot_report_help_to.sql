@@ -6,6 +6,7 @@ call proc_fill_from_encounter;
 -- 4570 
 -- total de 730 encuentros.
 -- total de 738 encuentro 
+-- total de 739 encuentros 
 
 select pda_pivot_report.* from pda_pivot_report;
 
