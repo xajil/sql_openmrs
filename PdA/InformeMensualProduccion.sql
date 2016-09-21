@@ -13,6 +13,7 @@
 -- 1.0  Sacuj     20160913    initial
 ##########################################################################
 
+-- CANTIDAD DE PACIENTES POR PROVEEDOR 
 select provider.provider_id,  b.* from provider , -- Cantidad de pacientes por proveedor
 (
 	select provider_id, provider_name,  count(patient_id) pacientes from (
@@ -31,7 +32,7 @@ where provider.provider_id = b.provider_id;
 -- cantidad de pacientes embarazadas por proveedor
 -- proviene del campo embarazada_o_examen_positivo que contiene las mujeres con examen positivo más 
 -- las que sin examen son diagnosticadas como embarazadas.
-select provider_id, provider_name,  count(embarazada) embarazada from (
+select provider_id, provider_name,  count(DISTINCT PATIENT_ID)  from (
 	select   patient_id, embarazada , encounter_datetime, provider_id, provider_name  from
 	pda_pivot_report
     where embarazada = 1
@@ -40,13 +41,9 @@ where provider_id not in (18, 17)
 group by provider_id
 ;
 
-select  embarazada_o_examen_positivo, count(embarazada_o_examen_positivo) from pda_pivot_report
-group by embarazada_o_examen_positivo;
-
-
 
 -- Cantidad de pruebas de clugosa por proveedro 
-select provider_id, provider_name,  count(glucosa) glucosa from (
+select provider_id, provider_name,  count(DISTINCT PATIENT_ID) glucosa from (
 	select   patient_id, glucosa_azar glucosa, encounter_datetime, provider_id, provider_name  from
 	pda_pivot_report
     where glucosa_azar <> -1
@@ -150,46 +147,84 @@ select provider_id, provider_name,  count(pastillas) pastillas from (
  where provider_id not in (18, 17)
 group by provider_id;
 
-
- 
-SELECT * FROM pda_pivot_report
-where patient_id = 2081;
-
-
-	select   planificacion_familiar, count(*) from
+-- TOTAL DE CONSULTAS INICIALES
+select   provider_id, provider_name , count(encounter_id) from
 	pda_pivot_report
-    group by planificacion_familiar;
+    where tipo_consulta = 1  --  1 CONSULTAS INICIALES
+    group by provider_id; 
     
-    
-	select  implante, count(*) from
+-- TOTAL DE RECONSULTAS POR PROVIDER
+select   provider_id, provider_name , count(distinct patient_id) from
 	pda_pivot_report
-    group by implante;
+    where tipo_consulta = 2  --  2 RECONSULTAS
+    group by provider_id
+    ; 
 
-	select   pastillas, count(*) from
+
+-- HASTA AQUÍ LLEGAMOS 
+
+-- TOTAL DE PACIENTES EN RECONSULTA 
+select   count(distinct patient_id) from
 	pda_pivot_report
-    group by pastillas;
+    where tipo_consulta = 2  --  2 RECONSULTAS
+      ; 
     
-	select   depo, count(*) from
+select distinct(patient_id) from encounter
+where encounter.encounter_type = 2
+and voided = 0
+and encounter.encounter_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') ;
+    
+    
+    
+-- TOTAL PAPA EN PRIMERA VISITA    
+select   provider_id, provider_name, count(distinct PATIENT_ID) from
 	pda_pivot_report
-    group by depo;
+    where pap = 1267 
+    and tipo_consulta = 1  
+    group by provider_id;     
+    
+-- TOTAL PAPA EN RECONSULTA
+select  provider_id, provider_name, count(distinct PATIENT_ID) from
+	pda_pivot_report
+    where pap = 1267 
+    and tipo_consulta = 2
+    group by provider_id;     
+
+
+
+-- TOTAL DE PRUEBAS DE EMBARAZO
+select  provider_id, provider_name, count(distinct PATIENT_ID) from
+	pda_pivot_report
+    where prueba_embarazo = 1 
+    group by provider_id;  
+
+
+-- TOTAL DE TRATAMIENTO DE EIP
+select  provider_id, provider_name, count(distinct PATIENT_ID) from
+	pda_pivot_report
+    where eip_tratamiento = 1 
+    group by provider_id;  
     
     
-				SELECT 
-				obs.value_coded,  			-- encounter.encounter_type ,
-                count(obs.concept_id)
-				-- into var_tipo_plan_fam,  	-- var_tip_consul_plan_fam, 
-                -- var_cant_plan_fam
-				FROM obs, encounter
-				WHERE 
-				obs.encounter_id = encounter.encounter_id
-				and obs.concept_id = 162971 -- PLANIFICACION FAMILIAR
-				and obs.voided = 0 
-				and encounter.voided = 0
-				-- and obs.person_id = var_patient_id
-                -- and obs.encounter_id = var_encounter_id
-				and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
-				group by obs.value_coded;      
-                
-        if (var_tipo_plan_fam = 7873) then
-        elseif (var_tipo_plan_fam = 907 ) then
-        elseif (var_tipo_plan_fam =104625 ) then                
+-- TOTAL DE TRATAMIENTO INFLAMACION SEVERA 
+-- PATIENT_ID,, PATIENT_ID
+select  provider_id, provider_name, count(distinct PATIENT_ID) from
+	pda_pivot_report
+    where trat_inflam_severa = 1 
+    group by provider_id;      
+
+-- TOTAL DE TRATAMIENTO VAGINOSIS BACTERIANA
+select  provider_id, provider_name, count(distinct PATIENT_ID) from
+	pda_pivot_report
+    where trat_vaginosis_bac = 1 
+    group by provider_id;     
+
+-- TOTAL DE TRATAMIENTO CANDIDIASIS VAGINAL
+select  provider_id, provider_name, count(distinct PATIENT_ID) from
+	pda_pivot_report
+    where trat_candidiasis_vag = 1 
+    group by provider_id;   
+    
+
+  
+    

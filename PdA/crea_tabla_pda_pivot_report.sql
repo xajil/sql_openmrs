@@ -23,10 +23,9 @@ agencia  int (5),
 elegible  int (5) ,
 tipo_consulta  int (5) ,
 
-pap_inicial  int (11),
+pap int (11),
 -- tip_consul_pap int (3),
-cant_pap_inicial int(5),
-
+cant_pap int(5),
 
 pelvico  int (11),
 -- tip_consul_pelvico int (3),
@@ -79,6 +78,12 @@ planificacion_familiar  int (11),
 implante  int (3),
 depo  int (3),
 pastillas  int (3),
+
+
+trat_inflam_severa int(3),
+trat_vaginosis_bac int (3),
+trat_candidiasis_vag int (3),  
+
 
 form_id int (11),
 provider_id int (11),

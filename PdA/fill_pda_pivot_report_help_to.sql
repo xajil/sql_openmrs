@@ -7,11 +7,16 @@ call proc_fill_from_encounter;
 -- total de 730 encuentros.
 -- total de 738 encuentro 
 -- total de 739 encuentros 
+-- total de 741 encuentros 20160921 
+-- TOTAL DE 740 encuentros 
+
+
 
 select pda_pivot_report.* from pda_pivot_report;
 
 
 TRUNCATE TABLE error_log_pda_repo;
+
 select * from error_log_pda_repo;
 
 
