@@ -29,17 +29,31 @@ select provider.provider_id,  b.* from provider , -- Cantidad de pacientes por p
 ) b
 where provider.provider_id = b.provider_id;
 
+
+		select  provider_id, provider_name, count(distinct patient_id) from
+		pda_pivot_report
+		where provider_id <>  17
+        group by provider_id
+        ;
+
 -- cantidad de pacientes embarazadas por proveedor
 -- proviene del campo embarazada_o_examen_positivo que contiene las mujeres con examen positivo más 
 -- las que sin examen son diagnosticadas como embarazadas.
-select provider_id, provider_name,  count(DISTINCT PATIENT_ID)  from (
+select * from 
+(select provider_id, provider_name,  count(DISTINCT PATIENT_ID) embarazadas  from (
 	select   patient_id, embarazada , encounter_datetime, provider_id, provider_name  from
 	pda_pivot_report
     where embarazada = 1
  ) a
 where provider_id not in (18, 17)
 group by provider_id
+) embarazadas
 ;
+
+		select  provider_id, provider_name, count(distinct patient_id) tot_embarazadas from
+		pda_pivot_report
+		where  embarazada = 1
+        group by provider_id;
 
 
 -- Cantidad de pruebas de clugosa por proveedro 
@@ -58,6 +72,13 @@ select provider_id, provider_name,  count(DISTINCT PATIENT_ID) glucosa from (
 where provider_id not in (18, 17)
 group by provider_id
 ;
+
+
+	select  provider_id, provider_name, count(distinct patient_id)  from
+	pda_pivot_report
+    where glucosa_azar <> -1 or glucosa_ayunas <> -1
+    group by provider_id;
+    
 /*
 	select   patient_id, glucosa_azar, encounter_datetime, provider_id, provider_name ,count(*)  from
 	pda_pivot_report
@@ -96,6 +117,12 @@ where provider_id not in (18, 17)
 group by provider_id
 ;
 
+	select provider_id, provider_name, count(distinct patient_id) test_vih  
+    from pda_pivot_report
+    where vih <> -1
+	and provider_id not in (18, 17)
+	group by provider_id
+;
 
 -- Cantidad de pruebas sifilis
 select provider_id, provider_name,  count(sifilis) sifilis from (
@@ -107,6 +134,15 @@ where provider_id not in (18, 17)
 group by provider_id
 ;
 
+-- Cantidad de pruebas sifilis
+	select provider_id, provider_name, count(distinct patient_id)
+    from
+	pda_pivot_report
+    where sifilis <> -1
+	and provider_id not in (18, 17)
+	group by provider_id
+;
+
 -- Cantidad de pruebas hepatitis_b
 select provider_id, provider_name,  count(hepatitis_b) hepatitis_b from (
 	select   patient_id, hepatitis_b , encounter_datetime, provider_id, provider_name  from
@@ -116,6 +152,12 @@ select provider_id, provider_name,  count(hepatitis_b) hepatitis_b from (
  where provider_id not in (18, 17)
 group by provider_id;
 
+-- Cantidad de pruebas hepatitis_b
+	select   provider_id, provider_name, count(distinct patient_id)  from
+	pda_pivot_report
+    where hepatitis_b <> -1
+    and provider_id not in (18, 17)
+	group by provider_id;
 
 -- Cantidad Planificación Familiar DEPO
 select provider_id, provider_name,  count(depo) depo from (
@@ -127,7 +169,36 @@ select provider_id, provider_name,  count(depo) depo from (
  where provider_id not in (18, 17)
 group by provider_id;
 
+	select  provider_id, provider_name, count(distinct patient_id)  from
+	pda_pivot_report
+    where depo <> -1
+    and depo = 1
+	and provider_id not in (18, 17)
+	group by provider_id
+;
+
+
 -- Cantidad Planificación Familiar Implantes
+select provider_id, provider_name,  count(implante) implante from (
+	select   patient_id, implante , encounter_datetime, provider_id, provider_name  from
+	pda_pivot_report
+    where implante <> -1
+    and implante = 1
+ ) a
+ where provider_id not in (18, 17)
+group by provider_id;
+
+
+-- Cantidad Planificación Familiar Implantes
+	select  provider_id, provider_name, count(distinct patient_id) implantes  from
+	pda_pivot_report
+    where implante <> -1
+    and implante = 1
+    and provider_id not in (18, 17)
+	group by provider_id
+    ;
+
+
 select provider_id, provider_name,  count(implante) implante from (
 	select   patient_id, implante , encounter_datetime, provider_id, provider_name  from
 	pda_pivot_report
@@ -146,6 +217,15 @@ select provider_id, provider_name,  count(pastillas) pastillas from (
  ) a
  where provider_id not in (18, 17)
 group by provider_id;
+
+
+	select  provider_id, provider_name, count(distinct patient_id)  from
+	pda_pivot_report
+    where pastillas <> -1
+    and pastillas = 1
+	and provider_id not in (18, 17)
+	group by provider_id
+;
 
 -- TOTAL DE CONSULTAS INICIALES
 select   provider_id, provider_name , count(encounter_id) from
@@ -176,14 +256,14 @@ and encounter.encounter_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') 
     
     
     
--- TOTAL PAPA EN PRIMERA VISITA    
+-- TOTAL PAP EN PRIMERA VISITA    
 select   provider_id, provider_name, count(distinct PATIENT_ID) from
 	pda_pivot_report
     where pap = 1267 
     and tipo_consulta = 1  
     group by provider_id;     
     
--- TOTAL PAPA EN RECONSULTA
+-- TOTAL PAP EN RECONSULTA
 select  provider_id, provider_name, count(distinct PATIENT_ID) from
 	pda_pivot_report
     where pap = 1267 
@@ -195,36 +275,39 @@ select  provider_id, provider_name, count(distinct PATIENT_ID) from
 -- TOTAL DE PRUEBAS DE EMBARAZO
 select  provider_id, provider_name, count(distinct PATIENT_ID) from
 	pda_pivot_report
-    where prueba_embarazo = 1 
+    where prueba_embarazo <> -1 
     group by provider_id;  
 
+select  prueba_embarazo, count(*)   from pda_pivot_report
+group by prueba_embarazo;
 
 -- TOTAL DE TRATAMIENTO DE EIP
-select  provider_id, provider_name, count(distinct PATIENT_ID) from
-	pda_pivot_report
+	select  provider_id, provider_name, count(distinct PATIENT_ID) 
+    from pda_pivot_report
     where eip_tratamiento = 1 
     group by provider_id;  
     
     
 -- TOTAL DE TRATAMIENTO INFLAMACION SEVERA 
 -- PATIENT_ID,, PATIENT_ID
-select  provider_id, provider_name, count(distinct PATIENT_ID) from
-	pda_pivot_report
+	select  provider_id, provider_name, count(distinct PATIENT_ID) 
+    from pda_pivot_report
     where trat_inflam_severa = 1 
     group by provider_id;      
 
 -- TOTAL DE TRATAMIENTO VAGINOSIS BACTERIANA
-select  provider_id, provider_name, count(distinct PATIENT_ID) from
-	pda_pivot_report
+	select  provider_id, provider_name, count(distinct PATIENT_ID) 
+    from pda_pivot_report
     where trat_vaginosis_bac = 1 
     group by provider_id;     
 
 -- TOTAL DE TRATAMIENTO CANDIDIASIS VAGINAL
-select  provider_id, provider_name, count(distinct PATIENT_ID) from
-	pda_pivot_report
+	select  provider_id, provider_name, count(distinct PATIENT_ID) 
+    from pda_pivot_report
     where trat_candidiasis_vag = 1 
     group by provider_id;   
     
+select date_format(encounter_datetime, '%Y%m') from pda_pivot_report; 
 
   
     
