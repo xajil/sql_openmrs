@@ -10,7 +10,7 @@
 -- Called by        : OpenMRS Sql Data Set
 ##########################################################################
 -- ver  user      date        change  
--- 1.0  Sacuj     20160913    initial
+-- 1.0  @nefsacuj     20160913    initial
 ##########################################################################
 
 -- truncate table produccion_mensual_provider;

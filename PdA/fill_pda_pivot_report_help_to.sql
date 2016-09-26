@@ -9,6 +9,7 @@ call proc_fill_from_encounter;
 -- total de 739 encuentros 
 -- total de 741 encuentros 20160921 
 -- TOTAL DE 740 encuentros 
+-- total de 746 encuentros 20160924
 
 
 
