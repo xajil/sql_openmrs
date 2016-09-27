@@ -14,6 +14,7 @@
 ##########################################################################
 select 'Pacientes' NombreCampo, count(distinct patient_id) total
 		from pda_pivot_report
+		where tipo_consulta in (1,2)
 union 
 select 'Embarazadas' NombreCampo, count(distinct patient_id) total
 		from pda_pivot_report
@@ -23,9 +24,18 @@ select 'Consultas Iniciales' NombreCampo, count(encounter_id) total
 		from pda_pivot_report
 		where tipo_consulta = 1 --  Consultas Iniciales
 union 
-select 'Reconsultas' NombreCampo, count(distinct patient_id) total
+select 'Pacientes en Reconsultas' NombreCampo, count(distinct patient_id) total -- t 
 		from pda_pivot_report
-		where tipo_consulta = 2  --  2 RECONSULTAS
+		where tipo_consulta = 2  --  2 RECONSULTAS 
+union        
+-- agregar total de pacientes vistos en reconsutas  
+select 'Numero Reconsultas' NombreCampo, count(*)  total from (
+select  patient_id,  count(encounter_datetime) 
+from pda_pivot_report
+	where tipo_consulta = 2
+	group by encounter_datetime, patient_id    
+    order by patient_id desc
+    ) b    
 union 
 select 'Glucosa' NombreCampo, count(distinct patient_id) total
 		from pda_pivot_report
@@ -102,8 +112,15 @@ select 'Planificacion' NombreCampo, count(distinct patient_id) total
 		from pda_pivot_report
 		where implante = 1 or pastillas = 1 or depo = 1;
         
+        
+
+-- Promedio de Pacientes Vistos proveedor.
+select provider_id,  provider_name , count(distinct patient_id)
+from pda_pivot_report
+group by provider_id;       
+
+select provider_id,  provider_name , count(distinct encounter_datetime)
+from pda_pivot_report
+group by provider_id;       
    
-        
-
-
-        
+   

@@ -8,46 +8,46 @@ declare var_location_id int (11);
 declare var_location_name  varchar (255);
 declare var_ciclo_prestamo int (11) ;
 declare var_agencia int (5) default 0;
-declare var_elegible int (5) ;
-declare var_tipo_consulta int (5) ;
+declare var_elegible int (5) default 0;
+declare var_tipo_consulta int (5) default 0;
 
-declare var_pap_inicial int (11) ;
+declare var_pap int (11) default 0;
 -- declare var_tip_consul_pap int (3);
-declare var_cant_pap_inicial int (5) ;
+declare var_cant_pap int (5) default 0 ;
 
-declare var_pelvico int (11);
+declare var_pelvico int (11) default 0;
 -- declare var_tip_consul_pelvico int(3);
-declare var_cant_pelvico int (5);
+declare var_cant_pelvico int (5) default 0;
 
-declare var_eip int (11);
+declare var_eip int (11) default 0;
 -- declare var_tip_consul_eip int (3);
-declare var_cant_eip int (3);
-declare var_eip_tratamiento int (3);
+declare var_cant_eip int (3) default 0;
+declare var_eip_tratamiento int (3) default 0;
 
-declare var_glucosa_ayunas int (11);
+declare var_glucosa_ayunas int (11) default 0;
 -- declare var_tip_consul_glucosa_ayunas int (3);
-declare var_cant_glucosa_ayunas int (3);
+declare var_cant_glucosa_ayunas int (3) default 0 ;
 
-declare var_glucosa_azar int (11);
+declare var_glucosa_azar int (11) default 0;
 -- declare var_tip_consul_glucosa_azar int (3);
-declare var_cant_glucosa_azar int (3);
+declare var_cant_glucosa_azar int (3) default 0;
 
-declare var_glucosa_elevada int (3);
+declare var_glucosa_elevada int (3) default 0;
 	-- PRESION ARTERIAL SISTOLICA
-		declare var_presion_sistolica int (11);
+		declare var_presion_sistolica int (11) default 0;
 	-- 	declare var_tip_consul_sistolica int (3);
-		declare var_cant_sistolica int (3);
+		declare var_cant_sistolica int (3) default 0;
    	-- PRESION ARTRRIAL DIASTOLICA
-		declare var_presio_diastolica int (11);
+		declare var_presio_diastolica int (11) default 0;
 	-- declare var_tip_consul_diastolica int (3);
-		declare var_cant_diastolica int (3);
+		declare var_cant_diastolica int (3) default 0;
 	-- PRESION ELEVADA
-		declare var_presion_art_elevada int (3);
+		declare var_presion_art_elevada int (3) default 0;
 -- PRUEBAS DE EMBARAZO        
-declare var_prueba_embarazo int (11);
+declare var_prueba_embarazo int (11) default 0;
 -- declare var_tip_consul_embarazo int (3);
-declare var_cant_prueba_embarazo int (3);
-declare var_embarazo_positivo int (3);
+declare var_cant_prueba_embarazo int (3) default 0;
+declare var_embarazo_positivo int (3) default 0;
 
 declare var_ets int (11);
 declare var_vih int (11);
@@ -55,19 +55,24 @@ declare var_sifilis int (11);
 declare var_hepatitis_b int (3);
 declare var_ets_positivo int (11) ; -- cualquiera de las 3 anteriores positvo
 
-declare var_seno_examen int (11);
+declare var_seno_examen int (11) default 0;
 -- declare var_tip_consul_seno int (3);
-declare var_cant_examen_seno int (3);
-declare var_resultado_examen_seno int (11);
+declare var_cant_examen_seno int (3) default 0;
+declare var_resultado_examen_seno int (11) default 0;
 
-declare var_planificacion_familiar int (11);
+declare var_planificacion_familiar int (11) default 0;
 declare var_implante int (3) default 0;
 declare var_depo int (3) default 0;
 declare var_pastillas int (3) default 0;
 
+declare var_trat_inflam_severa int (3) default 0;
+declare var_trat_vaginosis_bac int (3) default 0;
+declare var_trat_candidiasis_vag int (3) default 0;
+
 declare var_encounter_id int (11);
 declare var_form_id int (11);
 declare var_provider_id int (11);
+declare var_provider_name varchar (250);
 
 
 declare var_tipo_plan_fam int (11);
@@ -90,7 +95,7 @@ declare  var_encounter_type int (3);
 
 declare existe_ciclo_prestamo int default 0;
 declare existe_agencia int default 0;
-declare existe_pap_inicial int default 0;
+declare existe_pap int default 0;
 declare existe_ex_pelvico int default 0;
 declare existe_eip int default 0;
 declare existe_tratamiento_eip int default 0;
@@ -109,6 +114,13 @@ declare existe_pruebas_ets int default 0;
 declare existe_prueba_vih int default 0;
 declare existe_prueba_sifilis int default 0;
 declare existe_prueba_hepatitis int default 0;
+declare existe_nombre_provider int default 0;
+declare var_embarazada int default 0;
+declare var_embarazada_act int default 0;
+declare var_embarazada_fin int default 0;
+declare existe_trat_inflamacion int default 0;
+declare existe_trat_vaginosis int default 0;
+declare existe_trat_candidiasis int default 0;
 
 declare num_rows int default 0;
 declare loop_ctrl int default 0;
@@ -121,14 +133,14 @@ declare cur_patients cursor for
 select  patient_identifier.identifier, patient_identifier.patient_id, encounter.location_id, location.name,
 encounter.encounter_id, encounter.encounter_datetime, encounter.encounter_type , encounter.form_id , encounter_provider.provider_id 
 	from patient_identifier, location, encounter, encounter_provider
-    where patient_identifier.location_id = location.location_id
+    where encounter.location_id = location.location_id
 		and encounter.patient_id = patient_identifier.patient_id
         and encounter.encounter_id = encounter_provider.encounter_id
         and encounter.encounter_datetime  between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
         and encounter.voided = 0
         and encounter_provider.voided = 0
 		and patient_identifier.voided = 0    
-        -- and patient_identifier.patient_id = 1622
+        -- and patient_identifier.patient_id = 1675
         ; -- ,  -- en wk identifier_type = 2  para asegura que es numero_open
 --  and patient_identifier.patient_id in (  139 , 1744 , 1558, 491 , 1646,1521,110,528, 99)
 
@@ -231,24 +243,24 @@ select FOUND_ROWS () into num_rows;
 			WHERE 
 			obs.encounter_id = encounter.encounter_id
 			and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
-			and obs.concept_id = pap_inicial_concept_id
+			and obs.concept_id IN ( 162972, 162978) -- PAP INICIAL Y PAP REPETIDO
 			and obs.value_coded = hecho_concept_value
 			and obs.person_id = var_patient_id
 			and obs.voided = voided_reg 
             and obs.encounter_id = var_encounter_id
 			and encounter.voided = voided_reg
             )
-    , 0 ) INTO existe_pap_inicial ; 
+    , 0 ) INTO existe_pap ; 
     
-    if (existe_pap_inicial > 0 )then 
+    if (existe_pap > 0 )then 
 			SELECT obs.value_coded, -- encounter.encounter_type, 
             count(obs.concept_id) 
-            into var_pap_inicial,   -- var_tip_consul_pap, 
-            var_cant_pap_inicial  FROM obs, encounter
+            into var_pap,   -- var_tip_consul_pap, 
+            var_cant_pap  FROM obs, encounter
 			WHERE 
 			obs.encounter_id = encounter.encounter_id
 			and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
-			and obs.concept_id = pap_inicial_concept_id
+			and obs.concept_id  IN ( 162972, 162978) -- PAP INICIAL Y PAP REPETIDO
 			and obs.value_coded = hecho_concept_value
 			and obs.person_id = var_patient_id
 			and obs.voided = voided_reg 
@@ -256,9 +268,9 @@ select FOUND_ROWS () into num_rows;
             and obs.encounter_id = var_encounter_id
 			group by obs.value_coded, encounter.encounter_type, obs.concept_id, obs.person_id;
 	else 
-    set var_pap_inicial = -1;
+    set var_pap = -1;
     -- set var_tip_consul_pap = -1;
-    set var_cant_pap_inicial = -1;
+    set var_cant_pap = -1;
     end if; 
 		
 
@@ -574,8 +586,7 @@ end if;
    -- existe_prueba_embarazo
 		select ifnull (
         (select 
-					count(obs.value_coded)
-					-- into azar_glucosa_valor
+					count(obs.person_id)
 					from obs, encounter
 					where obs.encounter_id = encounter.encounter_id
 					and concept_id = 45 -- PRUBA EMBARAZO 
@@ -584,14 +595,15 @@ end if;
 					and obs.voided = voided_reg
                     and obs.encounter_id = var_encounter_id
 					and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+                    group by obs.person_id -- obs.value_coded, obs.concept_id,  
                     )
         , 0) into existe_prueba_embarazo;
         
 			if (existe_prueba_embarazo > 0) then
-				/*
+				
                 SELECT 
-				obs.value_coded,  encounter.encounter_type ,count(obs.concept_id)
-				into var_prueba_embarazo,  var_tip_consul_embarazo, var_cant_prueba_embarazo
+				obs.value_coded,   count(obs.concept_id) -- encounter.encounter_type ,
+				into var_prueba_embarazo,   var_cant_prueba_embarazo  -- var_tip_consul_embarazo,
 				FROM obs, encounter
 				WHERE 
 				obs.encounter_id = encounter.encounter_id
@@ -599,31 +611,90 @@ end if;
 				and obs.voided = voided_reg 
 				and encounter.voided = voided_reg
 				and obs.person_id = var_patient_id
-                -- AND obs.value_coded in (664, 703, 1304,1138 )
+                AND obs.value_coded in (664, 703, 1304,1138 )
+                and obs.encounter_id = var_encounter_id
                --  and obs.value_coded <> 1118
 				and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
 				group by obs.value_coded, obs.concept_id, obs.person_id;  
-                */
-				set var_prueba_embarazo = 1;
-				-- set var_tip_consul_embarazo = 1;
+                /*
+                set var_prueba_embarazo = 1;
 				set var_cant_prueba_embarazo = 1;
+                */
+                
             else 
 				set var_prueba_embarazo = -1;
 				-- set var_tip_consul_embarazo = -1;
+                set var_embarazo_positivo = -1;
 				set var_cant_prueba_embarazo = -1;
             end if;
             
             -- OBSERVACIÓN QUE INDICA QUE MUJER ESTÁ EMBARAZADA
             -- existe_obs_embarazada
             -- en agosto no existe observacion actualmente embarazada
-   
-   -- EMBARAZO POSITIVO
+
+	-- EMBARAZO POSITIVO
    if (var_prueba_embarazo = 703 ) then
 	set var_embarazo_positivo = 1;
-   else
+   elseif(var_prueba_embarazo = 664 ) then
 	set var_embarazo_positivo = 0;
-   end if;
+   elseif(var_prueba_embarazo = 1138 ) then
+	set var_embarazo_positivo = 0;
+   elseif(var_prueba_embarazo = 1304 ) then
+	set var_embarazo_positivo = 0;
+	else
+	 set var_embarazo_positivo = 0; 
+   end if;   
+ 
    
+select ifnull(
+(
+select count(*) from 
+(
+select obs.person_id --  -- , obs.value_coded -- , --  count(*) 
+from obs, encounter
+	where obs.encounter_id = encounter.encounter_id
+		and obs.concept_id = 160596   -- estado de menstraucion
+		and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+		and obs.value_coded = 1434
+		and obs.voided = 0
+		and obs.person_id = var_patient_id
+        and obs.encounter_id = var_encounter_id
+union
+select obs.person_id  -- obs.person_id  -- , obs.value_coded
+from obs, encounter
+where obs.encounter_id = encounter.encounter_id
+		and obs.concept_id = 163066 -- porque no le dio planificacion
+		and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+		and obs.value_coded = 1434
+		and obs.voided = 0
+		and obs.person_id = var_patient_id
+        and obs.encounter_id = var_encounter_id
+UNION 
+select  obs.person_id -- obs.person_id -- , obs.value_coded 
+ from obs, encounter
+	where obs.encounter_id = encounter.encounter_id
+		and obs.concept_id = 5272 -- EMBARAZADA ACTUALMENTE
+		and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+		and obs.value_coded = 1065
+		and obs.voided = 0
+		and obs.person_id = var_patient_id 
+        and obs.encounter_id = var_encounter_id ) tbl_embarazos
+-- group by  obs.person_id
+)
+,0) into var_embarazada;
+
+if(var_embarazada>0) then
+	set var_embarazada_act = 1;
+   else
+	set var_embarazada_act = 0;
+end if; 
+
+if ( var_embarazada_act = 1 or var_embarazo_positivo = 1) then 
+	set var_embarazada_fin = 1;
+else 
+	set var_embarazada_fin = 0;
+end if; 
+-- var_embarazada_fin 
    
    -- EXAMEN DE SENO HECHO
    -- en agosto no existe con algún valor en EXAMEN HECHO, PERO SÍ EN LOS RESULTADOS
@@ -674,7 +745,6 @@ end if;
 		select ifnull (
         (select 
 					count(obs.value_coded)
-					-- into azar_glucosa_valor
 					from obs, encounter
 					where obs.encounter_id = encounter.encounter_id
 					and concept_id = 162971 -- PLANIFICACION FAMILIAR
@@ -714,7 +784,7 @@ end if;
         end if; 
         
         -- existen otros tipo de planificiación no considerados en este script
-        if (var_tipo_plan_fam = 7873) then
+        if (var_tipo_plan_fam = 1873) then
         set var_implante=1;
         set var_depo = 0;
         set var_pastillas =0;
@@ -839,6 +909,95 @@ set var_hepatitis_b = -1;
 end if; 
 
 
+-- determinar si existe tratamiento INFLAMACIÓN SEVERA
+-- existe_trat_inflamacion
+SELECT IFNULL(
+(
+select count(orders.patient_id) from drug_order, drug, orders
+where drug_order.drug_inventory_id = drug.drug_id
+and drug_order.order_id = orders.order_id
+and orders.discontinued = 1
+and orders.concept_id IN( 73041, 71780, 79782) --  juntos siempre
+and orders.patient_id = var_patient_id
+and orders.start_date  between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+group by orders.patient_id
+having count(orders.concept_id) = 3
+order by orders.patient_id
+), 0) into existe_trat_inflamacion;
+
+if(existe_trat_inflamacion>0) then
+set var_trat_inflam_severa=1; -- ESTÁ CON TRATAMIENTO 
+else
+set var_trat_inflam_severa=0; -- SIN TRATAMIENTO 
+end if;
+
+
+
+-- DETERMINAR SI EXISTE TRATAMIENTO VAGINOSIS BACTERIANA 
+-- existe_trat_vaginosis
+SELECT IFNULL(
+(
+select count(orders.patient_id) -- , drug.name  
+from drug_order, drug, orders
+where drug_order.drug_inventory_id = drug.drug_id
+and drug_order.order_id = orders.order_id
+and orders.patient_id = var_patient_id
+and orders.discontinued = 1
+and orders.concept_id = 79782 
+AND orders.concept_id NOT IN (73041, 71780, 75222 )
+and orders.start_date  between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+group by orders.patient_id
+order by orders.patient_id
+), 0) into existe_trat_vaginosis ;
+
+if (existe_trat_vaginosis>0) then
+set var_trat_vaginosis_bac=1;
+else
+set var_trat_vaginosis_bac=0;
+end if;
+
+-- DETERMINAR SI EXISTE TRATAMIENTO CANDIDIASIS VAGINAL
+-- existe_trat_candidiasis
+select ifnull(
+(
+select count(orders.patient_id)
+from drug_order, drug, orders
+where drug_order.drug_inventory_id = drug.drug_id
+and drug_order.order_id = orders.order_id
+and orders.patient_id = var_patient_id
+and orders.discontinued = 1
+and orders.concept_id = 960 
+and orders.start_date  between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+group by orders.patient_id
+),0) into existe_trat_candidiasis ;
+
+if(existe_trat_candidiasis>0) then
+set var_trat_candidiasis_vag = 1;
+else
+set var_trat_candidiasis_vag = 0;
+end if;
+
+
+select ifnull(
+(select  count(provider_id)
+  from provider, person_name
+where 
+provider.person_id = person_name.person_id
+and provider.provider_id = var_provider_id
+)
+,0) into existe_nombre_provider;
+
+if (existe_nombre_provider > 0) then 
+select  concat(given_name, " ", family_name) 
+ into var_provider_name
+ from provider, person_name
+where 
+provider.person_id = person_name.person_id
+and provider.provider_id = var_provider_id
+;
+else 
+set var_provider_name = "Sin Nombre";
+end if; 
         
 		-- select  var_numero_open, var_patient_id, var_ciclo_prestamo, var_agencia, var_elegible,
         -- var_pap_inicial, var_tip_consul_pap, var_cant_pap_inicial
@@ -848,7 +1007,7 @@ end if;
         insert into  pda_pivot_report 
         (
         patient_id, numero_open, encounter_id,  encounter_datetime, location_id, location_name, ciclo_prestamo, agencia,elegible,tipo_consulta,
-        pap_inicial,cant_pap_inicial,-- tip_consul_pap,
+        pap,cant_pap,-- tip_consul_pap,
         pelvico,cant_pelvico, -- tip_consul_pelvico, 
         eip, -- tip_consul_eip, 
         cant_eip, eip_tratamiento,
@@ -873,7 +1032,7 @@ prueba_embarazo ,
 -- tip_consul_embarazo,
 cant_prueba_embarazo,
 
-embarazada_o_examen_positivo,
+embarazada,
 
 ets,
 vih,
@@ -891,8 +1050,15 @@ planificacion_familiar,
 implante,
 depo,
 pastillas,
+
+trat_inflam_severa,
+trat_vaginosis_bac,
+trat_candidiasis_vag,
+
+
 form_id,
-provider_id
+provider_id,
+provider_name
 
 
         ) values (
@@ -907,8 +1073,8 @@ var_agencia,
 var_elegible,
 var_tipo_consulta,
 
-var_pap_inicial,
-var_cant_pap_inicial,
+var_pap,
+var_cant_pap,
 -- var_tip_consul_pap,
 
 	var_pelvico,
@@ -941,7 +1107,8 @@ var_prueba_embarazo,
 -- var_tip_consul_embarazo,
 var_cant_prueba_embarazo,
 
-var_embarazo_positivo,
+-- var_embarazo_positivo,
+var_embarazada_fin,
 
 var_ets,
 var_vih,
@@ -959,8 +1126,13 @@ var_implante,
 var_depo,
 var_pastillas,
 
+var_trat_inflam_severa,
+var_trat_vaginosis_bac,
+var_trat_candidiasis_vag,
+
 var_form_id,
-var_provider_id
+var_provider_id,
+var_provider_name
 
         );
         
@@ -970,7 +1142,217 @@ var_provider_id
         
 	end loop loop_patients;
     
-select  num_rows, loop_ctrl;
+    -- select  var_embarazada_act ,var_embarazo_positivo , var_embarazada_fin ,  var_encounter_id;
+    -- EXECUTE IMMEDIATE concat("select * from ", @table_name, " where a=", @val);
+    
+   --  EXECUTE IMMEDIATE concat(" DELETE from produccion_mensual_provider where anio_mes =  '201608' ");  
+   
+     SET @t1 =CONCAT("DELETE from produccion_mensual_provider");
+	 PREPARE stmt3 FROM @t1;
+	 EXECUTE stmt3;
+	 DEALLOCATE PREPARE stmt3;
+    
+	-- EXECUTE IMMEDIATE concat('DELETE from produccion_mensual_provider');
+    -- DELETE from produccion_mensual_provider where anio_mes =  '201608'; 
+    commit; 
+    
+SET @t2 = concat("insert into produccion_mensual_provider
+select 
+provider_id 'Id Proveedor', 
+provider_name 'Nombre Proveedor', 
+anio_mes, 
+sum(tot_pacientes) Pacientes , 
+sum(tot_embarazadas) 'Pacientes Embarazadas', 
+sum(consultas_iniciales) 'Consultas Iniciales', 
+sum(reconsultas) Reconsultas,
+sum(glucosa) Glucosa,  
+sum(pap_primera_visita) 'Pap en Primera Visita', 
+sum(pap_reconsulta) 'Pap Reconsulta',
+sum(examen_ets) 'Examen ETS',
+sum(embarazo_test) 'Pruebas Embarazo',
+sum(test_hepatitis) 'Pruebas Hepatitis',
+sum(test_sifilis  ) 'Pruebas Sifilis',
+sum(test_vih) 'Pruebas VIH',
+sum(depo) 'Depro-Provera',
+sum(implantes) Implantes, 
+sum(pastillas) Pastillas, 
+sum(eip) 'Tratamiento EIP',
+sum(infla_severa) 'Tratamiento Inflamacion Severa',
+sum(vaginosis) 'Tratamiento Vaginosis Bacteriana',
+sum(candidiasis) 'Tratamiento Candidiasis Vaginal'
+from
+(
+select *
+from
+(		select  provider_id, provider_name, date_format(encounter_datetime, '%Y%m') anio_mes,  count(distinct patient_id) tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih, 0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis     
+		from
+		pda_pivot_report
+        group by provider_id
+) pacientes
+union       
+select *
+from 
+(		select  provider_id, provider_name,date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes , count(distinct patient_id)  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih, 0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis     
+		from
+		pda_pivot_report
+		where  embarazada = 1
+        group by provider_id
+) embarazadas
+union
+select * from (
+		select provider_id, provider_name,date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes, 0  tot_embarazadas, count(encounter_id) consultas_iniciales, 0 reconsultas, 0 glucosa , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih, 0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis              
+        from
+		pda_pivot_report
+		where tipo_consulta = 1  --  1 CONSULTAS INICIALES
+		group by provider_id 
+) consultas_iniciales
+union 
+select * from (
+		select provider_id, provider_name, date_format(encounter_datetime, '%Y%m') anio_mes, 0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, count(distinct patient_id), 0 glucosa, 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih, 0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis     
+        from
+        pda_pivot_report
+		where tipo_consulta = 2  --  2 RECONSULTAS
+		group by provider_id
+) reconsultas
+union 
+select * from (
+		select  provider_id, provider_name, date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, count(distinct patient_id) glucosa, 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih, 0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis   
+			from (
+			select   patient_id, glucosa_azar glucosa, encounter_datetime, provider_id, provider_name  from
+			pda_pivot_report
+			where glucosa_azar <> -1
+			-- and provider_id = 20
+			union 
+			select   patient_id, glucosa_ayunas glucosa, encounter_datetime, provider_id, provider_name  from
+			pda_pivot_report
+			where glucosa_ayunas <> -1
+			-- and provider_id = 20
+			group by encounter_datetime, patient_id
+		 ) a
+		group by provider_id
+
+) glucosas
+union 
+select * from
+(
+		select  provider_id, provider_name,date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , count(distinct PATIENT_ID) pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih, 0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis   
+		from pda_pivot_report
+		where pap = 1267 
+		and tipo_consulta = 1  
+		group by provider_id
+
+)  pap_en_primera_visita
+union 
+select * from 
+(
+		select  provider_id, provider_name,date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, count(distinct PATIENT_ID) pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih, 0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis  
+        from pda_pivot_report
+		where pap = 1267 
+		and tipo_consulta = 2
+		group by provider_id 
+) pap_reconsulta
+union 
+select * from 
+(
+		select   provider_id, provider_name,date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, 0 pap_reconsulta, count(distinct patient_id) examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih, 0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis    
+        from pda_pivot_report
+		where ets <> -1
+		group by provider_id
+) ets
+union 
+select * from (
+		select  provider_id, provider_name,date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, count(distinct patient_id) embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih, 0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis  
+		from pda_pivot_report
+		where prueba_embarazo <> -1
+		group by provider_id
+) test_embarazo
+union
+select * from  (
+		select provider_id, provider_name, date_format(encounter_datetime, '%Y%m') anio_mes, 0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, count(distinct patient_id) test_hepatitis, 0 test_sifilis, 0 test_vih, 0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis  
+		from
+		pda_pivot_report
+		where hepatitis_b <> -1
+		group by provider_id
+) tbl_hepatitis
+union 
+select * from (
+	select provider_id, provider_name, date_format(encounter_datetime, '%Y%m') anio_mes, 0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, count(distinct patient_id) test_sifilis, 0 test_vih, 0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis
+    from
+	pda_pivot_report
+    where sifilis <> -1
+	group by provider_id
+    ) tbl_sifilis
+union 
+select * from 
+(	select provider_id, provider_name,date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, count(distinct patient_id) test_vih, 0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis  
+    from pda_pivot_report
+    where vih <> -1
+	group by provider_id
+) tbl_vih
+union 
+select * from 
+(	select  provider_id, provider_name,date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih  , count(distinct patient_id)  depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis
+	from pda_pivot_report
+    where depo <> -1
+    and depo = 1	
+	group by provider_id
+) tbl_depo
+union 
+select * from 
+(	select provider_id, provider_name,date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih  ,  0 depo, count(distinct patient_id) implantes, 0 pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis	
+	from
+	pda_pivot_report
+    where implante <> -1
+    and implante = 1    
+	group by provider_id
+) tbl_implantes
+union 
+select * from 
+(	select provider_id, provider_name,date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih  ,  0 depo, 0 implantes, count(distinct patient_id) pastillas, 0 eip, 0 infla_severa,0 vaginosis,0 candidiasis	
+	from pda_pivot_report
+    where pastillas <> -1
+    and pastillas = 1
+	group by provider_id
+) tbl_pastillas
+union 
+select * from 
+(	select provider_id, provider_name,date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih  ,  0 depo, 0 implantes, 0 pastillas, count(distinct patient_id) eip, 0 infla_severa,0 vaginosis,0 candidiasis	
+    from pda_pivot_report
+    where eip_tratamiento = 1 
+    group by provider_id
+) tbl_eip
+union
+select * from 
+(	select provider_id, provider_name,date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih  ,  0 depo, 0 implantes, 0 pastillas, 0 eip, count(distinct patient_id) infla_severa,0 vaginosis,0 candidiasis	
+    from pda_pivot_report
+    where trat_inflam_severa = 1 
+    group by provider_id
+) tbl_is
+union
+select * from 
+(	select  provider_id, provider_name, date_format(encounter_datetime, '%Y%m') anio_mes, 0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih  ,  0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa, count(distinct patient_id) vaginosis, 0 candidiasis	
+    from pda_pivot_report
+    where trat_vaginosis_bac = 1 
+    group by provider_id
+) tbl_vaginosis
+union 
+select * from
+(	select  provider_id, provider_name,date_format(encounter_datetime, '%Y%m') anio_mes,  0 tot_pacientes, 0  tot_embarazadas, 0 consultas_iniciales, 0 reconsultas, 0 glucosa  , 0 pap_primera_visita, 0 pap_reconsulta, 0 examen_ets, 0 embarazo_test, 0 test_hepatitis, 0 test_sifilis, 0 test_vih  ,  0 depo, 0 implantes, 0 pastillas, 0 eip, 0 infla_severa, 0 vaginosis, count(distinct patient_id) candidiasis	
+    from pda_pivot_report
+    where trat_candidiasis_vag = 1 
+    group by provider_id
+) tbl_candidiasis
+) tbl_fin
+group by provider_id, provider_name")
+;
+
+	 PREPARE stmt4 FROM @t2;
+	 EXECUTE stmt4;
+	 DEALLOCATE PREPARE stmt4;
+	 commit;
+
+
+	select  num_rows, loop_ctrl;
 			    
 close cur_patients;
 
