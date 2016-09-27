@@ -323,7 +323,7 @@ and  voided=0
 	 from obs
 	where concept_id = 1619 -- EXAMENES DE Sífilis
 	and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
-	and value_coded = 103 -- POSITIVO 
+	and value_coded = 703 -- POSITIVO 
 	and  voided=0
 	;
 
