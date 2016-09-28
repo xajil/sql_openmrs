@@ -12,94 +12,154 @@
 -- ver  user      date        change  
 -- 1.0  @nefsacuj     20160924    initial
 ##########################################################################
-select 'Pacientes' NombreCampo, count(distinct patient_id) total_chimal
+select 'Pacientes' NombreCampo, count(distinct patient_id) total_solola
 		from pda_pivot_report
 		where tipo_consulta in (1,2)
-        and location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
 union 
-select 'Embarazadas' NombreCampo, count(distinct patient_id) total_chimal
+select 'Embarazadas' NombreCampo, count(distinct patient_id) total_solola
 		from pda_pivot_report
 		where  embarazada = 1
-        and location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
 union        
-select 'Consultas Iniciales' NombreCampo, count(encounter_id) total_chimal
+select 'Consultas Iniciales' NombreCampo, count(encounter_id) total_solola
 		from pda_pivot_report
 		where tipo_consulta = 1 --  Consultas Iniciales
-        and location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
 union 
-select 'Pacientes en Reconsultas' NombreCampo, count(distinct patient_id) total_chimal -- t 
+select 'Pacientes en Reconsultas' NombreCampo, count(distinct patient_id) total_solola -- t 
 		from pda_pivot_report
 		where tipo_consulta = 2  --  2 RECONSULTAS 
-        and location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
-union        
--- agregar total de pacientes vistos en reconsutas  
-select 'Numero Reconsultas' NombreCampo, count(*)  total_chimal from (
+union         
+select 'Numero Reconsultas' NombreCampo, count(*)  total_solola from (
 select  patient_id,  count(encounter_datetime) 
 from pda_pivot_report
-	where tipo_consulta = 2
-    and location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
+	where tipo_consulta = 2    
 	group by encounter_datetime, patient_id    
     order by patient_id desc
     ) b    
 union 
-select 'Glucosa' NombreCampo, count(distinct patient_id) total_chimal
+select 'Glucosa' NombreCampo, count(distinct patient_id) total_solola
 		from pda_pivot_report
-		where location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)        
-        and glucosa_azar <> -1 or glucosa_ayunas <> -1
+        where glucosa_azar <> -1 or glucosa_ayunas <> -1
 union
-select 'Pap' NombreCampo, count(distinct patient_id) total_chimal
+select 'Pap' NombreCampo, count(distinct patient_id) total_solola
 		from pda_pivot_report
 		where pap = 1267
-        and location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
 union 
-select 'ETS' NombreCampo, count(distinct patient_id) total_chimal    
+select 'ETS' NombreCampo, count(distinct patient_id) total_solola    
 		from pda_pivot_report
 		where ets <> -1 
-        and location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
 union 
-select 'Planificacion' NombreCampo, count(distinct patient_id) total_chimal	
+select 'Planificacion' NombreCampo, count(distinct patient_id) total_solola	
 		from pda_pivot_report
-		where 
-		location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
-        and implante = 1 or pastillas = 1 or depo = 1
+		where implante = 1 or pastillas = 1 or depo = 1
 union 
-select 'Tratamiento Inflamacion Severa' NombreCampo, count(distinct patient_id) total_chimal	
+select 'Tratamiento Inflamacion Severa' NombreCampo, count(distinct patient_id) total_solola	
 		from pda_pivot_report
 		where trat_inflam_severa = 1
-        and  location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
 union 
-	select  'Vaginosis' NombreCampo, count(distinct patient_id) total_chimal
+	select  'Vaginosis' NombreCampo, count(distinct patient_id) total_solola
 		from pda_pivot_report
 		where trat_vaginosis_bac = 1 
-        and  location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
 union 
-	select  'Candidiasis' NombreCampo, count(distinct patient_id) total_chimal	
+	select  'Candidiasis' NombreCampo, count(distinct patient_id) total_solola	
 		from pda_pivot_report
 		where trat_candidiasis_vag = 1 
-        and  location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
 union 
-	select 'Examen Pelvico' NombreCampo, count(distinct patient_id) total_chimal 
+	select 'Examen Pelvico' NombreCampo, count(distinct patient_id) total_solola 
     from pda_pivot_report 
 	where pelvico = 1267
-    and  location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
 union 
-	select 'Examen de Seno' NombreCampo, count(distinct patient_id) total_chimal from pda_pivot_report 
+	select 'Examen de Seno' NombreCampo, count(distinct patient_id) total_solola 
+    from pda_pivot_report 
 	where seno_examen <> -1 
-    and  location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
 union 
-	select 'Presion Arterial' NombreCampo, COUNT(DISTINCT(PATIENT_ID)) total_chimal from pda_pivot_report 
-	where 
-    location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
-    and presion_sistolica <> -1
+	select 'Presion Arterial' NombreCampo, COUNT(DISTINCT(PATIENT_ID)) total_solola 
+    from pda_pivot_report 
+	where presion_sistolica <> -1
     or presio_diastolica <> -1
     
 union    
-	select 'Tratamiento EIP' NombreCampo, count( distinct patient_id) total_chimal from pda_pivot_report 
-	where eip_tratamiento = 1 
-    and  location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
-;
+	select 'Tratamiento EIP' NombreCampo, count( distinct patient_id) total_solola 
+    from pda_pivot_report 
+	where eip_tratamiento = 1 ;
 
-select * from pda_pivot_report;
+    
+    /* 
+union
+select 'Pacientes' NombreCampo, count(distinct patient_id) total_solola
+		from pda_pivot_report
+		where tipo_consulta in (1,2)
+union 
+select 'Embarazadas' NombreCampo, count(distinct patient_id) total_solola
+		from pda_pivot_report
+		where  embarazada = 1
+union        
+select 'Consultas Iniciales' NombreCampo, count(encounter_id) total_solola
+		from pda_pivot_report
+		where tipo_consulta = 1 --  Consultas Iniciales
+union 
+select 'Pacientes en Reconsultas' NombreCampo, count(distinct patient_id) total_solola -- t 
+		from pda_pivot_report
+		where tipo_consulta = 2  --  2 RECONSULTAS 
+union         
+select 'Numero Reconsultas' NombreCampo, count(*)  total_solola from (
+select  patient_id,  count(encounter_datetime) 
+from pda_pivot_report
+	where tipo_consulta = 2    
+	group by encounter_datetime, patient_id    
+    order by patient_id desc
+    ) b    
+union 
+select 'Glucosa' NombreCampo, count(distinct patient_id) total_solola
+		from pda_pivot_report
+        where glucosa_azar <> -1 or glucosa_ayunas <> -1
+union
+select 'Pap' NombreCampo, count(distinct patient_id) total_solola
+		from pda_pivot_report
+		where pap = 1267
+union 
+select 'ETS' NombreCampo, count(distinct patient_id) total_solola    
+		from pda_pivot_report
+		where ets <> -1         
+union 
+select 'Planificacion' NombreCampo, count(distinct patient_id) total_solola	
+		from pda_pivot_report
+		where 
+		implante = 1 or pastillas = 1 or depo = 1
+union 
+select 'Tratamiento Inflamacion Severa' NombreCampo, count(distinct patient_id) total_solola	
+		from pda_pivot_report
+		where trat_inflam_severa = 1
+union 
+	select  'Vaginosis' NombreCampo, count(distinct patient_id) total_solola
+		from pda_pivot_report
+		where trat_vaginosis_bac = 1 
+union 
+	select  'Candidiasis' NombreCampo, count(distinct patient_id) total_solola	
+		from pda_pivot_report
+		where trat_candidiasis_vag = 1 
+union 
+	select 'Examen Pelvico' NombreCampo, count(distinct patient_id) total_solola 
+    from pda_pivot_report 
+	where pelvico = 1267
+union 
+	select 'Examen de Seno' NombreCampo, count(distinct patient_id) total_solola 
+    from pda_pivot_report 
+	where seno_examen <> -1     
+union 
+	select 'Presion Arterial' NombreCampo, COUNT(DISTINCT(PATIENT_ID)) total_solola 
+    from pda_pivot_report 
+	where 
+    presion_sistolica <> -1
+    or presio_diastolica <> -1   
+union    
+	select 'Tratamiento EIP' NombreCampo, count( distinct patient_id) total_solola 
+    from pda_pivot_report 
+	where eip_tratamiento = 1     
+;
+*/
+
+
+select distinct(agencia) from pda_pivot_report;
 
 -- agencias sololá
 -- 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,
