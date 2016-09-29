@@ -232,6 +232,12 @@ group by NombreCampo, NoOrden
 order by NoOrden asc      
 ;    
 
+
+
+
+
+
+
 	select NoOrden,NombreCampo , ab.NombreCampo, sum(total_solola) total_solola, sum(total_chimal)  total_chimal from (        
 		select 6 NoOrden, 'Glucosa' NombreCampo, count(distinct patient_id) total_solola, 0 total_chimal 
 		from pda_pivot_report
