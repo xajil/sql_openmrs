@@ -63,6 +63,28 @@ union
 	 where person.person_id = obs.person_id
 	 and obs.concept_id = 159644 -- hemoglobina
      and obs.voided =0
+union
+	 select 
+	 person.person_id, 
+	 obs.concept_id, 
+	 person.birthdate,  
+	 date_format(obs.date_created,'%Y-%m-%d') date_created , -- obs.date_created,-- max(obs.date_created)  max_obs_date_created_hemoglobina,
+	 obs.value_numeric
+	 from person, obs
+	 where person.person_id = obs.person_id
+	 and obs.concept_id = 790 -- SERUM CREATININE/ 
+     and obs.voided =0
+union
+	 select 
+	 person.person_id, 
+	 obs.concept_id, 
+	 person.birthdate,  
+	 date_format(obs.date_created,'%Y-%m-%d') date_created , -- obs.date_created,-- max(obs.date_created)  max_obs_date_created_hemoglobina,
+	 obs.value_numeric
+	 from person, obs
+	 where person.person_id = obs.person_id
+	 and obs.concept_id = 160080 -- Microalbumin creatinine ratio/Creatinina 
+     and obs.voided =0
 
 ;
 
