@@ -1,3 +1,7 @@
+-- para procesar el reporte.
+a) se crean las tablas abajo indicadas.
+b) se ejecuta el cursor cambiando el id_del concept_id para y generarlos uno a uno
+
 -- Ejecución de cursor de pacientes diabeticos.
 
 TRUNCATE TABLE obs_horizontal;
