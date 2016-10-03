@@ -70,9 +70,9 @@ select
 
 /* Conjunto de datos CONSULTA*/
 
-Select 
-	patient_identifier.identifier as numero_open,
+Select 	
     patient_identifier.patient_id,
+    patient_identifier.identifier as numero_open,
 	encounter.encounter_id,
     date_format(encounter.encounter_datetime, '%Y/%m/%d') as date_encounter ,
     'N/A' encounter_start_ts,
