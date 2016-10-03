@@ -2,7 +2,13 @@
 
 truncate table pda_pivot_report;         
 -- call proc_pivot_report_fill;     
-call proc_fill_from_encounter;
+-- call proc_fill_from_encounter;
+
+call proc_fill_from_encounter(
+STR_TO_DATE('09/01/2016', '%m/%d/%Y'), 
+STR_TO_DATE('09/30/2016', '%m/%d/%Y') 
+);
+
 -- 4570 
 -- total de 730 encuentros.
 -- total de 738 encuentro 
@@ -10,6 +16,7 @@ call proc_fill_from_encounter;
 -- total de 741 encuentros 20160921 
 -- TOTAL DE 740 encuentros 
 -- total de 746 encuentros 20160924
+-- total de 749 encuentros 20161003
 
 
 
