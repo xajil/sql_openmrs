@@ -5,6 +5,11 @@ truncate table pda_pivot_report;
 -- call proc_fill_from_encounter;
 
 call proc_fill_from_encounter(
+STR_TO_DATE('08/01/2016', '%m/%d/%Y'), 
+STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+);
+
+call proc_fill_from_encounter(
 STR_TO_DATE('09/01/2016', '%m/%d/%Y'), 
 STR_TO_DATE('09/30/2016', '%m/%d/%Y') 
 );

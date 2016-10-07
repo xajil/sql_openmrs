@@ -1,6 +1,42 @@
+/* Conjunto de datos CONSULTA*/
+
+Select 	
+    patient_identifier.patient_id,
+    patient_identifier.identifier as client_code,
+	encounter.encounter_id,
+    date_format(encounter.encounter_datetime, '%Y/%m/%d') as date_encounter ,
+    'N/A' encounter_start_ts,
+    'N/A' encounter_end_ts,
+    encounter_type.encounter_type_id,
+    encounter_type.name,
+    encounter_type.description, 
+    location.name location_name,
+    'N/A' encounter_lat,
+    'N/A' encounter_lat,
+    'N/A' encounter_long,
+    encounter_provider.provider_id,
+	person_name.given_name ,
+    person_name.family_name, 
+    form.form_id,
+    form.name form_name
+    from encounter, encounter_provider, provider, person, person_name, encounter_type, form, patient_identifier, location
+	WHERE encounter.encounter_type = encounter_type.encounter_type_id
+    and encounter.encounter_id = encounter_provider.encounter_id
+    and encounter_provider.provider_id = provider.provider_id
+    and provider.person_id = person.person_id
+    and person.person_id = person_name.person_id
+    and encounter.form_id  = form.form_id
+    and encounter.patient_id = patient_identifier.patient_id
+    and encounter.location_id = location.location_id
+    and patient_identifier.voided = 0
+    and date_format(encounter.encounter_datetime, '%Y%m%d')  between '20160801' and '20160831'
+    group by encounter.encounter_id
+    order by patient_identifier.patient_id desc	; 
+
 -- REPORTE DE VITALS --
 select 
-obs.person_id, patient_identifier.identifier client_code, 
+obs.person_id, 
+patient_identifier.identifier client_code, 
 concept_id vitals_id,
 case
 when (concept_id = 5085 )then 'Systolic'
