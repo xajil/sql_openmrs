@@ -14,6 +14,39 @@ STR_TO_DATE('09/01/2016', '%m/%d/%Y'),
 STR_TO_DATE('09/30/2016', '%m/%d/%Y') 
 );
 
+
+call proc_fill_from_encounter(
+STR_TO_DATE('10/01/2016', '%m/%d/%Y'), 
+STR_TO_DATE('10/31/2016', '%m/%d/%Y') 
+);
+
+
+call proc_fill_from_encounter(
+STR_TO_DATE('11/01/2016', '%m/%d/%Y'), 
+STR_TO_DATE('11/30/2016', '%m/%d/%Y') 
+);
+
+select * from pda_pivot_report
+where pda_pivot_report.encounter_datetime  between STR_TO_DATE('11/01/2016', '%m/%d/%Y') and
+STR_TO_DATE('11/30/2016', '%m/%d/%Y');
+
+select * from pda_pivot_report;
+
+delete from  pda_pivot_report 
+where encounter_datetime between 
+	STR_TO_DATE('11/01/2016', '%m/%d/%Y') AND 
+	STR_TO_DATE('11/30/2016', '%m/%d/%Y'); 
+commit;
+
+/* delete from  pda_pivot_report where encounter_datetime between 
+	STR_TO_DATE('10/01/2016', '%m/%d/%Y') AND 
+	STR_TO_DATE('10/31/2016', '%m/%d/%Y'); 
+
+commit;
+
+*/
+
+
 -- 4570 
 -- total de 730 encuentros.
 -- total de 738 encuentro 

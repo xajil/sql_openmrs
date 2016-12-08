@@ -11,9 +11,10 @@
 ##########################################################################
 -- ver  user      	date        change  
 -- 1.0  @nefsacuj   20161010    initial
+-- 1.1  @nefsacuj   20161108    validacion de nul en EIP con tratamiento chimal y sololá.
 ##########################################################################
 -- EIP CON TRATAMIENTO
-SELECT * FROM (
+SELECT IFNULL(SUM(CANT),0) CANT, 'SOLOLA' AGENCIA,  'EIP_CON_TRATAMIENTO' INDICADOR FROM (
 select  
 COUNT( distinct orders.patient_id) CANT, 
 'SOLOLA' AGENCIA, 
@@ -24,7 +25,7 @@ and drug_order.order_id = orders.order_id
 and orders.discontinued = 1
 and orders.concept_id IN( 73041, 79782, 75222) --  juntos siempre
 -- and orders.patient_id = var_patient_i
-and orders.start_date  between STR_TO_DATE('20160901', '%Y%m%d') and STR_TO_DATE('20160930', '%Y%m%d')
+and orders.start_date  between STR_TO_DATE('20161001', '%Y%m%d') and STR_TO_DATE('20161031', '%Y%m%d')
 and orders.patient_id in (
 SELECT 
 obs.person_id FROM obs, encounter
@@ -35,7 +36,7 @@ and obs.value_coded  = 162968
 and obs.voided = 0 
 and encounter.voided = 0
 and encounter.location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) -- SOLOLA
-and date_format( obs.obs_datetime, '%Y%m%d') between STR_TO_DATE('20160901', '%Y%m%d') and STR_TO_DATE('20160930', '%Y%m%d')
+and date_format( obs.obs_datetime, '%Y%m%d') between STR_TO_DATE('20161001', '%Y%m%d') and STR_TO_DATE('20161031', '%Y%m%d')
 )
 group by orders.patient_id
 having count(orders.concept_id) = 3
@@ -59,7 +60,7 @@ and date_format( obs.obs_datetime, '%Y%m%d') between STR_TO_DATE('20160901', '%Y
 UNION 
 
 -- EIP CON TRATAMIENTO
-SELECT * FROM (
+SELECT IFNULL(SUM(CANT),0) CANT, 'CHIMAL' AGENCIA,  'EIP_CON_TRATAMIENTO' INDICADOR FROM (
 select  
 COUNT( distinct orders.patient_id) CANT, 
 'CHIMAL' AGENCIA, 
@@ -246,7 +247,7 @@ FROM obs, encounter
 WHERE 
 obs.encounter_id = encounter.encounter_id
 and obs.concept_id = 159780
-and obs.value_coded in (146931,148058,142248)
+and obs.value_coded in (146931,148058,142248) -- 
 and obs.voided = 0 
 and encounter.voided = 0
 and date_format( obs.obs_datetime, '%Y%m%d') between date_format ( (adddate( STR_TO_DATE('20160901', '%Y%m%d'), interval - 6 week)),  '%Y%m%d') and date_format ( (adddate( STR_TO_DATE('20160930', '%Y%m%d'), interval - 6 week)),  '%Y%m%d')
