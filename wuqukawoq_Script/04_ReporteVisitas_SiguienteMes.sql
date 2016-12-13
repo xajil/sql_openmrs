@@ -31,15 +31,14 @@ select
 			where   person.person_id = ls_person_patient_id
 				and ls_concept_id = 5089 
                 and ls_dias_obs > 90 
-                and (datediff ( :date , ls_birth ) between 730 and 1826 
+                and (datediff( :date , ls_birth ) between 730 and 1826 
                 )  
 		) then 'SI'  
       WHEN person.person_id = (
         select ls_person_patient_id  from PIVOTE_OBS 
 			where   person.person_id = ls_person_patient_id
 				AND datediff (  :date, ls_birth ) <= 730 
-                GROUP BY ls_person_patient_id)  THEN 'SI'  
-                
+                GROUP BY ls_person_patient_id )  THEN 'SI'                  
 	 ELSE '' END AS PesoTalla, 
 	 case 
      WHEN  person.person_id = (
@@ -63,20 +62,12 @@ select
      WHEN  person.person_id = (
         select ls_person_patient_id  from PIVOTE_OBS 
 			where   person.person_id = ls_person_patient_id
-				and ls_concept_id = 1621 
-                and ls_dias_obs > 30 
-                and (datediff (  :date , ls_birth ) > 182 
-                )  
+                and ls_concept_id = 1621
+                and person.person_id =  ls_person_patient_id
+                and ( value_numeric -  (datediff(:date , ls_obs_date_created)) ) < 15
+                and datediff(:date , ls_birth) > 180 
 		) then 'SI'  
-     WHEN  person.person_id = (
-        select ls_person_patient_id  from PIVOTE_OBS 
-			where   person.person_id = ls_person_patient_id
-				and ls_concept_id = 1621 
-                and ls_dias_obs <= 30 
-                and (datediff (  :date , ls_birth ) > 182 
-                )  
-		) then 'SI'
-	 ELSE 'SI' END AS Chispitas ,
+	 ELSE '' END AS Chispitas ,
 	case 
      WHEN  person.person_id = (
         select ls_person_patient_id  from PIVOTE_OBS 
@@ -119,16 +110,22 @@ select
 			where   person.person_id = ls_person_patient_id
 				and program_id = 12  ) 
        else ''         END AS formula,
-       'PlumpyNut', 'F-100' 
-from person, person_name, patient_identifier, location, person_attribute
+       null 'PlumpyNut', null 'F-100' , null 'Mani+'
+from person
+left join person_name
+     on person.person_id = person_name.person_id
+left join patient_identifier
+     on person.person_id = patient_identifier.patient_id  
+     and     patient_identifier.identifier_type=2
+left join location
+     on patient_identifier.location_id = location.location_id
+left join person_attribute
+	 on person.person_id = person_attribute.person_id
+left join patient_program
+	 on person.person_id = patient_program.patient_id
 where 
-person.person_id = person_name.person_id
-and person.person_id = patient_identifier.patient_id  
-and patient_identifier.identifier_type=2 
-and patient_identifier.location_id = location.location_id
-and person_attribute.person_id = person.person_id
-and person_attribute.person_attribute_type_id = 4
-and datediff (  :date, person.birthdate) <= 1826  
+datediff (  :date, person.birthdate) <= 1826  
 and patient_identifier.voided = 0
 and patient_identifier.identifier is not null
+and patient_program.program_id in (12, 13, 14, 9)
 group by numero_open, fecha_nacimiento, genero, comunidad;
