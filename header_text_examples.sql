@@ -97,3 +97,6 @@ Wuqu' Kawoq SQL HEADER
 #notes           :Install Vim and Emacs to use this script.
 #bash_version    :4.1.5(1)-release
 #==============================================================================
+
+
+Cambios realizados desde fedora.
