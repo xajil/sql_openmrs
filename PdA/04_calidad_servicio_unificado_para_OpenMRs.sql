@@ -11,8 +11,9 @@
 ##########################################################################
 -- ver  user      	date        change  
 -- 1.0  @nefsacuj   20161010    initial
+-- 1.2  @nefsacuj   20161108    validacion de nul en EIP con tratamiento chima y sololá.
 ##########################################################################
-SELECT * FROM (
+SELECT IFNULL(SUM(CANT),0) CANT, 'SOLOLA' AGENCIA,  'EIP_CON_TRATAMIENTO' INDICADOR FROM (
 select  
 COUNT( distinct orders.patient_id) CANT, 
 'SOLOLA' AGENCIA, 
@@ -53,7 +54,7 @@ and encounter.voided = 0
 and encounter.location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) -- SOLOLA
 and obs.obs_datetime between :startDate and :endDate
 UNION 
-SELECT * FROM (
+SELECT IFNULL(SUM(CANT),0) CANT, 'CHIMAL' AGENCIA,  'EIP_CON_TRATAMIENTO' INDICADOR FROM (
 select  
 COUNT( distinct orders.patient_id) CANT, 
 'CHIMAL' AGENCIA, 

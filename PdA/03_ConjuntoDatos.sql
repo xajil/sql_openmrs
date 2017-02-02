@@ -238,6 +238,7 @@ order by obs.person_id
 ##########################################################################
 -- ver  user          date        change  
 -- 1.0  @nefsacuj     20161006    initial
+-- 1.1  @nefsacuj     20161110    cambio de orders.discontinued por orders.voided para tomar los réginemes vigentes.
 ##########################################################################
 select 
 orders.patient_id,
@@ -252,7 +253,7 @@ where drug_order.drug_inventory_id = drug.drug_id
 and drug_order.order_id = orders.order_id
 and orders.patient_id = patient_identifier.patient_id
 and date_format(orders.start_date, '%Y%m%d')  between date_format(:startDate, '%Y%m%d') and date_format( :endDate, '%Y%m%d')
-and orders.discontinued = 1
+and orders.voided = 0
 and patient_identifier.voided = 0
 order by orders.patient_id;
 

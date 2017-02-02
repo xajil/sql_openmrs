@@ -16,8 +16,8 @@ and obs_int.value_coded in (146931,148058,142248)
 and obs_int.voided = 0 
 and encounter.voided = 0
 and obs.person_id = obs_int.person_id
-and date_format( obs_int.obs_datetime, '%Y%m%d') between date_format ( (adddate( STR_TO_DATE('20160901', '%Y%m%d'), interval - 6 week)),  '%Y%m%d') and date_format ( (adddate( STR_TO_DATE('20160930', '%Y%m%d'), interval - 6 week)),  '%Y%m%d')
-and datediff(obs.obs_datetie, obs_int.obs_datetime) <= 42
+and date_format( obs_int.obs_datetime, '%Y%m%d') between date_format ( (adddate( STR_TO_DATE('20161201', '%Y%m%d'), interval - 6 week)),  '%Y%m%d') and date_format ( (adddate( STR_TO_DATE('20161230', '%Y%m%d'), interval - 6 week)),  '%Y%m%d')
+and datediff(obs.obs_datetime, obs_int.obs_datetime) <= 42
 )
 ;    
 
@@ -31,5 +31,5 @@ and obs.concept_id = 159780
 and obs.value_coded in (146931,148058,142248)
 and obs.voided = 0 
 and encounter.voided = 0
-and date_format( obs.obs_datetime, '%Y%m%d') between date_format ( (adddate( STR_TO_DATE('20160901', '%Y%m%d'), interval - 6 week)),  '%Y%m%d') and date_format ( (adddate( STR_TO_DATE('20160930', '%Y%m%d'), interval - 6 week)),  '%Y%m%d')
+and date_format( obs.obs_datetime, '%Y%m%d') between date_format ( (adddate( STR_TO_DATE('20161201', '%Y%m%d'), interval - 6 week)),  '%Y%m%d') and date_format ( (adddate( STR_TO_DATE('20161230', '%Y%m%d'), interval - 6 week)),  '%Y%m%d')
 ;    

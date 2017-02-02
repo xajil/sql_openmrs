@@ -232,10 +232,27 @@ select obs.value_coded, count(obs.value_coded) from obs
 				and obs.concept_id = 159780 -- EXAMEN SENO 
 				and obs.voided = 0 -- voided_reg 
 				and encounter.voided =0 --  voided_reg
-				and obs.person_id = 1042 -- var_patient_id
+				and obs.person_id = 2661 -- var_patient_id
 				and obs.obs_datetime between STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')  
 				group by obs.value_coded, obs.concept_id, obs.person_id;  
 
+
+SELECT 
+				obs.value_coded,  		-- encounter.encounter_type ,
+                count(obs.concept_id)
+				-- into var_seno_examen,  	-- var_tip_consul_seno, 
+                -- var_cant_examen_seno
+				FROM obs, encounter
+				WHERE 
+				obs.encounter_id = encounter.encounter_id
+				and obs.concept_id = 159780 -- EXAMEN SENO 
+				and obs.voided = 0 
+				and encounter.voided = 0
+				and obs.person_id = 2661
+                -- and obs.encounter_id = var_encounter_id
+				and obs.obs_datetime between STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y') 
+				group by obs.value_coded, obs.concept_id, obs.person_id;
+                
   
   -- PLANIFICACION FAMILIAR 
         

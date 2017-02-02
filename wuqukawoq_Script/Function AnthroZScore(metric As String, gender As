@@ -1,0 +1,100 @@
+Function AnthroZScore(metric As String, gender As String, age As Double, value As Double, Optional secondary_value As Double)
+Dim numGender As Integer
+Dim useLength As Boolean
+Dim dataSheet As Worksheet
+Dim valueLookup As Double
+Dim lowAgeIndex, upperAgeIndex As Integer
+Dim tHeightZScore As Double
+Dim initial, acronym As String
+Dim metricType, genStr, tabStr, sheetName As String
+Dim lVal, mVal, sVal As Double
+Dim sd3pos, sd23pos, sd3neg, sd23neg As Double
+Dim zfa As Double
+
+On Error GoTo endErr
+
+If (StrComp(gender, "M") = 0 Or StrComp(gender, "m") = 0) Then
+    genStr = "M"
+ElseIf (StrComp(gender, "F") = 0 Or StrComp(gender, "f") = 0) Then
+    genStr = "F"
+Else
+    tHeightZScore = CVErr(xlErrValue)
+    Exit Function
+End If
+
+
+
+metric = UCase(metric)
+Debug.Print "Checking metric"
+If (metric = "TALLA" Or metric = "HEIGHT" Or metric = "HEIGHT (CM)" Or metric = "HFA") Then
+    metricType = "HFA" -- talla por edad 
+ElseIf (metric = "PESO" Or metric = "WEIGHT" Or metric = "WEIGHT (KG)" Or metric = "WFA") Then
+    metricType = "WFA"  -- peso por edad
+ElseIf (metric = "PESO/TALLA" Or metric = "WEIGHT/HEIGHT" Or metric = "WFL" Or metric = "WFH") Then
+    metricType = "WFL"   --  peso por talla 
+Else
+    tHeightZScore = CVErr(xlErrValue)
+    Exit Function
+End If
+
+--  PESO POR TALLA
+If metricType = "WFL" Then
+    If age < 2 * 30.4375 * 12 Then  -- menos de 2 años en días
+        tabStr = "<2"
+        valueLookup = secondary_value
+    Else
+        tHeightZScore = CVErr(xlErrValue)
+        Exit Function                   
+    End If
+Else  -- peso por edad, o talla por edad 
+    If age < 61 * 30.4375 Then   -- menos de 5 años en días
+            tabStr = "<5"
+            valueLookup = Int(age)
+    Else
+            tabStr = ">5" --para alguien mayor de 4 años calcula la edad en meses 
+            valueLookup = age / 30.4375
+    End If
+End If
+sheetName = metricType & "|" & tabStr & "|" & genStr
+Debug.Print "Referencing sheet: " & sheetName
+Set dataSheet = Sheets(sheetName)
+
+-- límite inferior de edad ()
+lowAgeIndex = WorksheetFunction.Match(valueLookup, dataSheet.Columns(1), 1)
+-- límite superior de edad ()
+upperAgeIndex = lowAgeIndex + 1
+ageDiff = valueLookup - dataSheet.Cells(lowAgeIndex, 1)
+Debug.Print ageDiff
+Debug.Print lowAgeIndex
+If (ageDiff < 1e-06) Then
+    lVal = dataSheet.Cells(lowAgeIndex, 2) - - entre 2 y 3
+    mVal = dataSheet.Cells(lowAgeIndex, 3) --  entre 3 y 5 
+    sVal = dataSheet.Cells(lowAgeIndex, 4) --  entre 4 y 5
+Else
+    lVal = dataSheet.Cells(lowAgeIndex, 2) + ageDiff * (dataSheet.Cells(upperAgeIndex, 2) - dataSheet.Cells(lowAgeIndex, 2))
+    mVal = dataSheet.Cells(lowAgeIndex, 3) + ageDiff * (dataSheet.Cells(upperAgeIndex, 3) - dataSheet.Cells(lowAgeIndex, 3))
+    sVal = dataSheet.Cells(lowAgeIndex, 4) + ageDiff * (dataSheet.Cells(upperAgeIndex, 4) - dataSheet.Cells(lowAgeIndex, 4))
+End If
+
+zfa = (((value / mVal) ^ lVal) - 1) / (sVal * lVal)
+
+-- PESO POR EDAD (PESO POR EDAD) Y PESO POR TALLA (WFL)
+If metricType = "WFA" Or metricType = "WFL" Then
+    If zfa > 3 Then
+        sd3pos = mVal * ((1 + lVal * sVal * 3) ^ (1 / lVal))
+        sd23pos = sd3pos - mVal * ((1 + lVal * sVal * 2) ^ (1 / lVal))
+        zfa = 3 + ((value - sd3pos) / sd23pos)
+    ElseIf zfa < (-3) Then
+        sd3neg = mVal * ((1 + lVal * sVal * (-3)) ^ (1 / lVal))
+        sd23neg = mVal * ((1 + lVal * sVal * (-2)) ^ (1 / lVal)) - sd3neg
+        zfa = -3 + ((value - sd3neg) / sd23neg)
+    End If
+End If
+
+
+
+AnthroZScore = zfa
+Exit Function
+endErr:
+AnthroZScore = CVErr(xlErrValue)
+End Function

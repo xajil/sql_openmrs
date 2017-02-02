@@ -14,6 +14,7 @@ STR_TO_DATE('09/01/2016', '%m/%d/%Y'),
 STR_TO_DATE('09/30/2016', '%m/%d/%Y') 
 );
 
+<<<<<<< HEAD
 
 
 -- 4570 
@@ -106,4 +107,53 @@ and obs.encounter_id = encounter.encounter_id
 and concept_id = 1619 -- EXAMENES DE Sífilis
 and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
 and obs.voided = 0;
+=======
+>>>>>>> refs/remotes/origin/master
 
+call proc_fill_from_encounter(
+STR_TO_DATE('10/01/2016', '%m/%d/%Y'), 
+STR_TO_DATE('10/31/2016', '%m/%d/%Y') 
+);
+
+
+call proc_fill_from_encounter(
+STR_TO_DATE('11/01/2016', '%m/%d/%Y'), 
+STR_TO_DATE('11/30/2016', '%m/%d/%Y') 
+);
+
+
+call proc_fill_from_encounter(
+STR_TO_DATE('12/01/2016', '%m/%d/%Y'), 
+STR_TO_DATE('12/30/2016', '%m/%d/%Y') 
+);
+
+
+call proc_fill_from_encounter(
+STR_TO_DATE('01/01/2017', '%m/%d/%Y'), 
+STR_TO_DATE('01/31/2017', '%m/%d/%Y') 
+);
+
+/* 
+delete from  pda_pivot_report 
+where encounter_datetime between 
+	STR_TO_DATE('11/01/2016', '%m/%d/%Y') AND 
+	STR_TO_DATE('11/30/2016', '%m/%d/%Y'); 
+commit;
+
+delete from  pda_pivot_report where encounter_datetime between 
+	STR_TO_DATE('10/01/2016', '%m/%d/%Y') AND 
+	STR_TO_DATE('10/31/2016', '%m/%d/%Y'); 
+
+commit;
+*/
+
+delete from  pda_pivot_report where encounter_datetime between 
+	STR_TO_DATE('01/01/2017', '%m/%d/%Y') AND 
+	STR_TO_DATE('01/31/2017', '%m/%d/%Y'); 
+commit;
+
+
+select * from pda_pivot_report where encounter_datetime between 
+	STR_TO_DATE('01/01/2017', '%m/%d/%Y') AND 
+	STR_TO_DATE('01/31/2017', '%m/%d/%Y')
+	order by patient_id asc ; -- 7652
