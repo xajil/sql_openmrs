@@ -33,6 +33,11 @@ STR_TO_DATE('12/30/2016', '%m/%d/%Y')
 );
 
 
+call proc_fill_from_encounter(
+STR_TO_DATE('01/01/2017', '%m/%d/%Y'), 
+STR_TO_DATE('01/31/2017', '%m/%d/%Y') 
+);
+
 /* 
 delete from  pda_pivot_report 
 where encounter_datetime between 
@@ -47,3 +52,13 @@ delete from  pda_pivot_report where encounter_datetime between
 commit;
 */
 
+delete from  pda_pivot_report where encounter_datetime between 
+	STR_TO_DATE('01/01/2017', '%m/%d/%Y') AND 
+	STR_TO_DATE('01/31/2017', '%m/%d/%Y'); 
+commit;
+
+
+select * from pda_pivot_report where encounter_datetime between 
+	STR_TO_DATE('01/01/2017', '%m/%d/%Y') AND 
+	STR_TO_DATE('01/31/2017', '%m/%d/%Y')
+	order by patient_id asc ; -- 7652
