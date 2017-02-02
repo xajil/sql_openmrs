@@ -14,6 +14,8 @@ STR_TO_DATE('09/01/2016', '%m/%d/%Y'),
 STR_TO_DATE('09/30/2016', '%m/%d/%Y') 
 );
 
+
+
 -- 4570 
 -- total de 730 encuentros.
 -- total de 738 encuentro 

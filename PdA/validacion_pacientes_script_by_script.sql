@@ -3,7 +3,7 @@
 		where concept_id = 163138 
 		-- and person_id = 76
         and obs.voided  = 0
-		and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')  
+		and obs.obs_datetime between STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')  
         group by person_id, obs.date_created
         having count(value_numeric) > 1; 
         
@@ -13,7 +13,7 @@
 		where concept_id = 163138 
 		and person_id = 1764
         and obs.voided  = 0
-		and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')         
+		and obs.obs_datetime between STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')  
         )
         , 0) ;
 
@@ -22,14 +22,14 @@
 		where concept_id = 163138 --  ciclo_prestamo_concept_id 
 		and person_id = 1764
         and obs.voided  = 0
-		and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+		and obs.obs_datetime between STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')  
         and obs.date_created = (
 			select max(obs.date_created) 
 			from obs
 			where concept_id = 163138 --  ciclo_prestamo_concept_id 
 			and person_id = 1764
             and obs.voided  = 0
-			and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+			and obs.obs_datetime between STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')   
         )
         ;
 
@@ -37,13 +37,13 @@
 			from obs
 			where concept_id = 163138 --  ciclo_prestamo_concept_id 
 			and person_id = 1688
-			and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y');
+			and obs.obs_datetime between STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')  ;
         
         select value_numeric, obs.obs_datetime, date_created -- into var_ciclo_prestamo 
         from obs
 		where concept_id = 163138 --  ciclo_prestamo_concept_id 
 		and person_id = 1505
-		and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+		and obs.obs_datetime between STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')   
         ;
 
 
@@ -75,7 +75,7 @@
             FROM obs, encounter
 			WHERE 
 			obs.encounter_id = encounter.encounter_id
-			and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+			and obs.obs_datetime between STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')  
 			and obs.concept_id = 162972 -- pap_inicial_concept_id
 			and obs.value_coded =1267 -- hecho_concept_value
 			and obs.person_id = 1688 -- var_patient_id
@@ -92,7 +92,7 @@
 			FROM obs, encounter
 			WHERE 
 			obs.encounter_id = encounter.encounter_id
-			and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+			and obs.obs_datetime between STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')  
 			and obs.concept_id = 162991 --  pelvico_concept_id
 			and obs.value_coded = 1267 -- hecho_concept_value
 			and obs.voided = 0 -- voided_reg 
@@ -111,7 +111,7 @@
 			and value_coded =162968 --  eip_hecho
 			and obs.person_id = 1688 --  var_patient_id
 			and obs.voided = 0 -- voided_reg
-			and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y')
+			and obs.obs_datetime between  STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')  
             group by obs.value_coded, encounter.encounter_type, obs.concept_id, obs.person_id;
 
     
@@ -123,7 +123,7 @@ where obs.concept_id = 162969 -- eip_tratamiento_concept_id
 and obs.person_id = 1688
 and  voided=0 -- voided_reg
 and value_coded = 163057 -- eip_value_con_tratamiento -- tiene tratamieto asignado 
-and obs.obs_datetime between  STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+and obs.obs_datetime between  STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')  
 group by obs.value_coded,  obs.concept_id, obs.person_id; 
 
             
@@ -139,7 +139,7 @@ group by obs.value_coded,  obs.concept_id, obs.person_id;
 				and obs.voided = 0 -- voided_reg 
 				and encounter.voided = 0 -- voided_reg
 				and obs.person_id = 1688 -- var_patient_id
-				and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+				and obs.obs_datetime between STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')  
 				group by obs.value_numeric,encounter.encounter_type , obs.concept_id, obs.person_id;            
                 
 		
@@ -154,7 +154,7 @@ group by obs.value_coded,  obs.concept_id, obs.person_id;
 				and obs.voided = 0 -- voided_reg 
 				and encounter.voided = 0 -- voided_reg
 				and obs.person_id = 1688 -- var_patient_id
-				and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+				and obs.obs_datetime between STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')  
 				group by encounter.encounter_type , obs.concept_id, obs.person_id;      
 					
 				
@@ -233,7 +233,7 @@ select obs.value_coded, count(obs.value_coded) from obs
 				and obs.voided = 0 -- voided_reg 
 				and encounter.voided =0 --  voided_reg
 				and obs.person_id = 1042 -- var_patient_id
-				and obs.obs_datetime between STR_TO_DATE('08/01/2016', '%m/%d/%Y') and STR_TO_DATE('08/31/2016', '%m/%d/%Y') 
+				and obs.obs_datetime between STR_TO_DATE('01/01/2017', '%m/%d/%Y') and STR_TO_DATE('01/31/2017', '%m/%d/%Y')  
 				group by obs.value_coded, obs.concept_id, obs.person_id;  
 
   

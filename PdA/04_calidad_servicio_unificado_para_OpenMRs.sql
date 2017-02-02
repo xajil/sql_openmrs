@@ -174,10 +174,23 @@ and encounter.location_id in (26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42
 and datediff(obs.obs_datetime, obs_int.obs_datetime) <= 42
 ) 
 UNION
+select count(*) CANT,
+'SOLOLA' AGENCIA,
+'DIABETES_IDENTIFICADO' INDICADOR
+ from patient_identifier, patient, patient_program
+where patient_identifier.patient_id = patient.patient_id
+and patient.patient_id = patient_program.patient_id
+and patient_program.program_id = 13
+and date_completed is null
+and patient_program.voided = 0
+and patient_identifier.voided = 0
+and patient_program.patient_id
+and patient_identifier.location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) -- SOLOLA
+UNION
 select 
 count(*) CANT,
 'SOLOLA' AGENCIA,
-'DIABETES_IDENTIFICADO' INDICADOR
+'DIABETES_CON_TRATAMIENTO'INDICADOR
  from patient_identifier, patient, patient_program
 where patient_identifier.patient_id = patient.patient_id
 and patient.patient_id = patient_program.patient_id
@@ -186,24 +199,25 @@ and date_completed is null
 and patient_program.voided = 0
 and patient_identifier.voided = 0
 and patient_identifier.location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) -- SOLOLA
+
+UNION
+select count(*) CANT,
+'CHIMAL' AGENCIA,
+'DIABETES_IDENTIFICADO'  INDICADOR
+ from patient_identifier, patient, patient_program
+where patient_identifier.patient_id = patient.patient_id
+and patient.patient_id = patient_program.patient_id
+and patient_program.program_id = 13
+and date_completed is null
+and patient_program.voided = 0
+and patient_identifier.voided = 0
+and patient_program.patient_id
+and patient_identifier.location_id in (26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50) -- CHIMALTENANGO
 union
-select count(*) CANT,
-'SOLOLA' AGENCIA,
-'DIABETES_CON_TRATAMIENTO' INDICADOR
- from patient_identifier, patient, patient_program
-where patient_identifier.patient_id = patient.patient_id
-and patient.patient_id = patient_program.patient_id
-and patient_program.program_id = 13
-and date_completed is null
-and patient_program.voided = 0
-and patient_identifier.voided = 0
-and patient_program.patient_id
-and patient_identifier.location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) -- SOLOLA
-UNION
 select 
 count(*) CANT,
 'CHIMAL' AGENCIA,
-'DIABETES_IDENTIFICADO' INDICADOR
+'DIABETES_CON_TRATAMIENTO' INDICADOR
  from patient_identifier, patient, patient_program
 where patient_identifier.patient_id = patient.patient_id
 and patient.patient_id = patient_program.patient_id
@@ -212,19 +226,7 @@ and date_completed is null
 and patient_program.voided = 0
 and patient_identifier.voided = 0
 and patient_identifier.location_id in (26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50) -- CHIMALTENANGO
-UNION
-select count(*) CANT,
-'CHIMAL' AGENCIA,
-'DIABETES_CON_TRATAMIENTO' INDICADOR
- from patient_identifier, patient, patient_program
-where patient_identifier.patient_id = patient.patient_id
-and patient.patient_id = patient_program.patient_id
-and patient_program.program_id = 13
-and date_completed is null
-and patient_program.voided = 0
-and patient_identifier.voided = 0
-and patient_program.patient_id
-and patient_identifier.location_id in (26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50) -- CHIMALTENANGO
+
 UNION
 SELECT 
 count(*) CANT, 
@@ -637,19 +639,6 @@ and patient_identifier.voided = 0
 UNION
 select 
 count(*) CANT,
-'CHIMAL' AGENCIA,
-'HYPERTENSIVES' INDICADOR
- from patient_identifier, patient, patient_program
-where patient_identifier.patient_id = patient.patient_id
-and patient.patient_id = patient_program.patient_id
-and patient_program.program_id = 2
-and patient_identifier.location_id in (26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50) -- CHIMALTENANGO
-and date_completed is null
-and patient_program.voided = 0
-and patient_identifier.voided = 0
-UNION
-select 
-count(*) CANT,
 'SOLOLA' AGENCIA,
 'HIPERTENSA CON TRATAMIENTO' INDICADOR
  from patient_identifier, patient, patient_program
@@ -674,6 +663,19 @@ and date_completed is null
 and patient_program.voided = 0
 and patient_identifier.voided = 0
 UNION
+select 
+count(*) CANT,
+'CHIMAL' AGENCIA,
+'HYPERTENSIVES' INDICADOR
+ from patient_identifier, patient, patient_program
+where patient_identifier.patient_id = patient.patient_id
+and patient.patient_id = patient_program.patient_id
+and patient_program.program_id = 2
+and patient_identifier.location_id in (26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50) -- CHIMALTENANGO
+and date_completed is null
+and patient_program.voided = 0
+and patient_identifier.voided = 0
+UNION
 SELECT 
 COUNT(*) CANT,
 'SOLOLA' AGENCIA,
@@ -688,20 +690,6 @@ and obs.value_coded in (1873, 907, 104625)
 and encounter.location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) -- SOLOLA
 and obs.obs_datetime between adddate( :startDate, interval - 1 year) and adddate(:endDate, interval - 1 year)
 UNION
-SELECT 
-COUNT(*) CANT,
-'CHIMAL' AGENCIA,
-'MUJERES QUE EMPEZARON PF' INDICADOR
-FROM obs, encounter
-WHERE 
-obs.encounter_id = encounter.encounter_id
-and obs.concept_id = 162971
-and obs.voided = 0
-and encounter.voided = 0
-and obs.value_coded in (1873, 907, 104625) 
-and encounter.location_id in (26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50) -- CHIMALTENANGO
-and obs.obs_datetime between adddate(:startDate, interval - 1 year) and adddate(:endDate, interval - 1 year)
-UNION
 select  
 COUNT(distinct orders.patient_id) CANT,
 'SOLOLA' AGENCIA,
@@ -723,6 +711,20 @@ and encounter.location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,2
 and obs.obs_datetime between adddate(:startDate, interval - 1 year) and adddate(:endDate, interval - 1 year)
 )
 UNION
+SELECT 
+COUNT(*) CANT,
+'CHIMAL' AGENCIA,
+'MUJERES QUE EMPEZARON PF' INDICADOR
+FROM obs, encounter
+WHERE 
+obs.encounter_id = encounter.encounter_id
+and obs.concept_id = 162971
+and obs.voided = 0
+and encounter.voided = 0
+and obs.value_coded in (1873, 907, 104625) 
+and encounter.location_id in (26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50) -- CHIMALTENANGO
+and obs.obs_datetime between adddate(:startDate, interval - 1 year) and adddate(:endDate, interval - 1 year)
+UNION
 select  
 COUNT(distinct orders.patient_id) CANT,
 'CHIMAL' AGENCIA,
@@ -743,6 +745,40 @@ and obs.value_coded in (1873, 907, 104625)
 and encounter.location_id in (26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50) -- CHIMALTENANGO
 and obs.obs_datetime between adddate(:startDate, interval - 1 year) and adddate(:endDate, interval - 1 year)
 )
+union
+select count(distinct person_id) CANT,
+'SOLOLA' AGENCIA,
+'PRESION ELEVADA' INDICADOR
+from (
+SELECT 
+	max(obs.value_numeric),  	
+	obs.person_id
+	FROM obs, encounter
+	WHERE 
+	obs.encounter_id = encounter.encounter_id
+	and obs.concept_id =  5085 
+	and obs.value_numeric >= 140
+    and encounter.location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) -- SOLOLA
+    and encounter.encounter_type = 1
+	and obs.voided = 0 
+	and encounter.voided = 0
+	and obs.obs_datetime between adddate(:startDate, interval - 6 week) and adddate(:endDate, interval - 6 week )
+    union    
+SELECT 
+max(obs.value_numeric), 
+obs.person_id
+FROM obs, encounter
+WHERE 
+obs.encounter_id = encounter.encounter_id
+and obs.concept_id =  5086 -- diastolica
+and obs.value_numeric >= 90
+and encounter.location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) -- SOLOLA
+and encounter.encounter_type = 1
+and obs.voided = 0 
+and encounter.voided = 0
+and obs.obs_datetime between adddate(:startDate, interval - 6 week) and adddate(:endDate, interval - 6 week)
+group by obs.person_id 
+) presion_elevada
 UNION
 SELECT 
 count(*) CANT,
@@ -788,38 +824,38 @@ FROM obs, encounter
 )
 union
 select count(distinct person_id) CANT,
-'SOLOLA' AGENCIA,
+'CHIMAL' AGENCIA,
 'PRESION ELEVADA' INDICADOR
 from (
 SELECT 
-	max(obs.value_numeric),  	
+	max(obs.value_numeric),
 	obs.person_id
 	FROM obs, encounter
 	WHERE 
 	obs.encounter_id = encounter.encounter_id
-	and obs.concept_id =  5085 
+	and obs.concept_id =  5085 -- sistolica
 	and obs.value_numeric >= 140
-    and encounter.location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) -- SOLOLA
+    and encounter.location_id in (26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50) -- CHIMALTENANGO
     and encounter.encounter_type = 1
 	and obs.voided = 0 
 	and encounter.voided = 0
-	and obs.obs_datetime between adddate(:startDate, interval - 6 week) and adddate(:endDate, interval - 6 week )
+	and obs.obs_datetime between adddate(:startDate, interval - 6 week) and adddate(:endDate, interval - 6 week)
     union    
 SELECT 
-max(obs.value_numeric), 
+max(obs.value_numeric),
 obs.person_id
 FROM obs, encounter
 WHERE 
 obs.encounter_id = encounter.encounter_id
 and obs.concept_id =  5086 -- diastolica
 and obs.value_numeric >= 90
-and encounter.location_id in (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) -- SOLOLA
+and encounter.location_id in (26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50) -- CHIMALTENANGO
 and encounter.encounter_type = 1
 and obs.voided = 0 
 and encounter.voided = 0
 and obs.obs_datetime between adddate(:startDate, interval - 6 week) and adddate(:endDate, interval - 6 week)
-group by obs.person_id 
-) presion_elevada
+group by obs.person_id) 
+presion_elevada
 UNION
 SELECT 
 count(*) CANT,
@@ -863,37 +899,4 @@ FROM obs, encounter
 			group by obs.person_id
 			) presion_elevada
 )
-union
-select count(distinct person_id) CANT,
-'CHIMAL' AGENCIA,
-'PRESION ELEVADA' INDICADOR
-from (
-SELECT 
-	max(obs.value_numeric),
-	obs.person_id
-	FROM obs, encounter
-	WHERE 
-	obs.encounter_id = encounter.encounter_id
-	and obs.concept_id =  5085 -- sistolica
-	and obs.value_numeric >= 140
-    and encounter.location_id in (26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50) -- CHIMALTENANGO
-    and encounter.encounter_type = 1
-	and obs.voided = 0 
-	and encounter.voided = 0
-	and obs.obs_datetime between adddate(:startDate, interval - 6 week) and adddate(:endDate, interval - 6 week)
-    union    
-SELECT 
-max(obs.value_numeric),
-obs.person_id
-FROM obs, encounter
-WHERE 
-obs.encounter_id = encounter.encounter_id
-and obs.concept_id =  5086 -- diastolica
-and obs.value_numeric >= 90
-and encounter.location_id in (26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50) -- CHIMALTENANGO
-and encounter.encounter_type = 1
-and obs.voided = 0 
-and encounter.voided = 0
-and obs.obs_datetime between adddate(:startDate, interval - 6 week) and adddate(:endDate, interval - 6 week)
-group by obs.person_id) 
-presion_elevada;
+;
